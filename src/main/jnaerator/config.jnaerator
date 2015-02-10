@@ -1,0 +1,34 @@
+-DUSE_XOPEN2KXSI 1
+-D__USE_XOPEN=1
+-D__USE_XOPEN 1
+-DUSE_XOPEN=1
+-DUSE_XOPEN 1
+-I/usr/include
+-I/usr/lib/gcc/x86_64-linux-gnu/4.7/include
+-o src/main/java
+-v
+-f
+-library c
+/usr/include/asm-generic/ioctls.h
+/usr/include/asm-generic/errno-base.h
+/usr/include/errno.h
+/usr/include/fcntl.h
+/usr/include/linux/input.h
+/usr/include/bits/fcntl.h
+/usr/include/bits/select.h
+/usr/include/signal.h
+/usr/include/stdlib.h
+/usr/include/stdio.h
+/usr/include/termios.h
+/usr/include/unistd.h
+/usr/include/sys/stat.h
+/usr/include/sys/select.h
+/usr/include/sys/types.h
+/usr/include/sys/wait.h
+/usr/include/sys/ioctl.h
+/usr/include/sys/mman.h
+/usr/include/bits/fcntl.h
+/usr/include/bits/ioctls.h
+/usr/include/bits/mman.h
+-runtime JNA
+-sizeAsLong
