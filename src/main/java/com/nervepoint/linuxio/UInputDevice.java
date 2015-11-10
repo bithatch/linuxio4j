@@ -659,9 +659,11 @@ public class UInputDevice implements Closeable {
                         }
                     }
                 }
+                
+                if(theDevice != null)
+                	return theDevice;
             }
         }
-
         throw new IOException("No devices that look like a pointer could be found.");
     }
 
@@ -1124,7 +1126,7 @@ public class UInputDevice implements Closeable {
     @Override
     public String toString() {
         return "UInputDevice [file=" + file + ", grabbed=" + grabbed + ", name=" + name + ", inputDriverVersion="
-                        + inputDriverVersion + ", deviceId=" + Arrays.toString(deviceId) + "]";
+                        + inputDriverVersion + ", caps=" + caps + ",deviceId=" + Arrays.toString(deviceId) + "]";
     }
 
     // Macros
