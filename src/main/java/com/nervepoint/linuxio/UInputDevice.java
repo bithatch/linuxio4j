@@ -989,6 +989,10 @@ public class UInputDevice implements Closeable {
             }
         }
     }
+    
+    public void open() {
+        open(file);
+    }
 
     private void open(File file) {
         LOG.debug("Opening device " + file + " for " + getClass());

@@ -2,17 +2,28 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<maven.compiler.target>1.7</maven.compiler.target>
+		<maven.compiler.source>1.7</maven.compiler.source>
+
+		<!-- Distribution properties. -->
+
+		<releasesRepositoryLocation>http://artifactory.javassh.com/nervepoint-releases</releasesRepositoryLocation>
+		<snapshotsRepositoryLocation>http://artifactory.javassh.com/nervepoint-snapshots</snapshotsRepositoryLocation>
+
+		<siteDeploymentLocation>sftp://root@artifactory.javassh.com/var/www/nervepoint-site
+		</siteDeploymentLocation>
 	</properties>
+	
 	<modelVersion>4.0.0</modelVersion>
-	<name>Linux I/O</name>
+	<name>Linux I/O For Java</name>
 	<description>A JNA based library providing access to some low-level Linux subsystems, including :-
 
 * UInput. Read events from various devices such as keyboards, mice, touchpads, and all other devices exposed by Linux through uinput
 
 * Frame Buffer. Write directly to the Linux framebuffer. Allows graphical user interfaces without X being present.</description>
-	<artifactId>linuxio</artifactId>
+	<artifactId>linuxio4j</artifactId>
 	<groupId>com.nervepoint</groupId>
-	<version>0.1-SNAPSHOT</version>
+	<version>1.1-SNAPSHOT</version>
 
 	<build>
 		<sourceDirectory>src/main/java</sourceDirectory>
@@ -51,6 +62,30 @@
 			</plugin>
 		</plugins>
 	</build>
+	
+	
+	<distributionManagement>
+		<repository>
+			<uniqueVersion>false</uniqueVersion>
+			<id>nervepoint-releases</id>
+			<name>Nervepoint Releases</name>
+			<url>${releasesRepositoryLocation}</url>
+			<layout>default</layout>
+		</repository>
+		<snapshotRepository>
+			<uniqueVersion>true</uniqueVersion>
+			<id>nervepoint-snapshots</id>
+			<name>Nervepoint Snapshots</name>
+			<url>${snapshotsRepositoryLocation}</url>
+			<layout>default</layout>
+		</snapshotRepository>
+		<site>
+			<id>nervepoint-site</id>
+			<url>${siteDeploymentLocation}/${project.artifactId}/</url>
+		</site>
+	</distributionManagement>
+	
+	
 	<dependencies>
 		<dependency>
 			<groupId>net.java.dev.jna</groupId>
