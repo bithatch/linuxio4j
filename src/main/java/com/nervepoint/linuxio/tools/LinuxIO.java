@@ -87,7 +87,7 @@ public class LinuxIO {
         System.out.println(dev);
         boolean grab = false;
         while (true) {
-            List<String> s = new ArrayList<>();
+            List<String> s = new ArrayList<String>();
             s.add("Read events");
             switch (menu(reader, "Read events", grab ? "Disable grab" : "Enable grab", "Select device", "Return")) {
                 case 1:
@@ -113,8 +113,8 @@ public class LinuxIO {
                     grab = !grab;
                     break;
                 case 3:
-                    List<String> devNames = new ArrayList<>();
-                    List<UInputDevice> devs = new ArrayList<>();
+                    List<String> devNames = new ArrayList<String>();
+                    List<UInputDevice> devs = new ArrayList<UInputDevice>();
                     for (UInputDevice d : UInputDevice.getAllKeyboardDevices()) {
                         devNames.add(d.getName());
                         devs.add(d);
@@ -137,7 +137,7 @@ public class LinuxIO {
         System.out.println(firstPointerDevice);
         boolean grab = false;
         while (true) {
-            List<String> s = new ArrayList<>();
+            List<String> s = new ArrayList<String>();
             s.add("Read events");
             switch (menu(reader, "Read events", grab ? "Disable grab" : "Enable grab", "Select device", "Return")) {
                 case 1:
@@ -162,8 +162,8 @@ public class LinuxIO {
                     grab = !grab;
                     break;
                 case 3:
-                    List<String> devNames = new ArrayList<>();
-                    List<UInputDevice> devs = new ArrayList<>();
+                    List<String> devNames = new ArrayList<String>();
+                    List<UInputDevice> devs = new ArrayList<UInputDevice>();
                     for (UInputDevice d : UInputDevice.getAllPointerDevices()) {
                         devNames.add(d.getName());
                         devs.add(d);

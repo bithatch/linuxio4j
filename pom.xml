@@ -13,7 +13,7 @@
 		<siteDeploymentLocation>sftp://root@artifactory.javassh.com/var/www/nervepoint-site
 		</siteDeploymentLocation>
 	</properties>
-	
+
 	<modelVersion>4.0.0</modelVersion>
 	<name>Linux I/O For Java</name>
 	<description>A JNA based library providing access to some low-level Linux subsystems, including :-
@@ -30,7 +30,6 @@
 		<testSourceDirectory>src/test/java</testSourceDirectory>
 		<outputDirectory>target/classes</outputDirectory>
 		<testOutputDirectory>target/test-classes</testOutputDirectory>
-		<finalName>${project.artifactId}</finalName>
 		<resources>
 			<resource>
 				<targetPath>.</targetPath>
@@ -56,14 +55,84 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
-					<source>1.7</source>
-					<target>1.7</target>
+					<source>1.6</source>
+					<target>1.6</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>2.4</version>
+				<configuration>
+					<archive>
+						<index>true</index>
+						<manifest>
+							<addClasspath>true</addClasspath>
+							<mainClass>com.nervepoint.linuxio.tools.LinuxIO</mainClass>
+						</manifest>
+						<manifestEntries>
+							<mode>development</mode>
+							<url>${project.url}</url>
+							<key>value</key>
+						</manifestEntries>
+					</archive>
 				</configuration>
 			</plugin>
 		</plugins>
 	</build>
-	
-	
+
+	<profiles>
+		<profile>
+			<id>uberjar</id>
+			<activation>
+				<property>
+					<name>uber</name>
+					<value>true</value>
+				</property>
+			</activation>
+			<build>
+				<finalName>${project.artifactId}</finalName>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-shade-plugin</artifactId>
+						<version>2.4</version>
+						<executions>
+							<execution>
+								<phase>package</phase>
+								<goals>
+									<goal>shade</goal>
+								</goals>
+								<configuration>
+									<filters>
+										<filter>
+											<artifact>*:*</artifact>
+											<excludes>
+												<exclude>META-INF/*.SF</exclude>
+												<exclude>META-INF/*.DSA</exclude>
+												<exclude>META-INF/*.RSA</exclude>
+												<exclude>**/*.jar</exclude>
+											</excludes>
+										</filter>
+									</filters>
+									<transformers>
+										<transformer
+											implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+											<manifestEntries>
+												<Main-Class>com.nervepoint.linuxio.tools.LinuxIO</Main-Class>
+												<Class-Path></Class-Path>
+											</manifestEntries>
+										</transformer>
+									</transformers>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+
 	<distributionManagement>
 		<repository>
 			<uniqueVersion>false</uniqueVersion>
@@ -84,8 +153,8 @@
 			<url>${siteDeploymentLocation}/${project.artifactId}/</url>
 		</site>
 	</distributionManagement>
-	
-	
+
+
 	<dependencies>
 		<dependency>
 			<groupId>net.java.dev.jna</groupId>
@@ -96,18 +165,6 @@
 			<scope>compile</scope>
 		</dependency>
 
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-			<version>1.7.7</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-simple</artifactId>
-			<version>1.7.7</version>
-			<scope>provided</scope>
-		</dependency>
 	</dependencies>
 	<repositories>
 

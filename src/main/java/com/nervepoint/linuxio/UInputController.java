@@ -6,9 +6,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Semaphore;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.nervepoint.linuxio.CLib.pollfd;
 import com.nervepoint.linuxio.UInputDevice.Event;
@@ -31,14 +30,15 @@ import com.nervepoint.linuxio.UInputDevice.Event;
  *
  */
 public class UInputController {
-	final static Logger LOG = LoggerFactory.getLogger(UInputDevice.class);
+
+	final static Logger LOG = Logger.getLogger(UInputController.class.getName());
 
 	public interface Callback {
 		void event(UInputDevice device, Event event);
 	}
 
 	private Map<UInputDevice, Callback> devices = new HashMap<UInputDevice, UInputController.Callback>();
-	private Map<Integer, UInputDevice> devicesByFd = new HashMap<>();
+	private Map<Integer, UInputDevice> devicesByFd = new HashMap<Integer, UInputDevice>();
 	private pollfd[] pollFds;
 	private Semaphore semaphore = new Semaphore(1);
 
@@ -120,7 +120,7 @@ public class UInputController {
 						try {
 							poll();
 						} catch (IOException e) {
-							LOG.info("Failed to poll.", e);
+							LOG.log(Level.SEVERE, "Failed to poll.", e);
 						}
 					}
 				};
@@ -155,8 +155,8 @@ public class UInputController {
 				int rel = CLib.INSTANCE.poll(pollFds, pollFds.length, 1000);
 				if (rel == 0) {
 					// Timeout, no data, just loop
-					if (LOG.isTraceEnabled()) {
-						LOG.trace("No data, waiting");
+					if (LOG.isLoggable(Level.FINEST)) {
+						LOG.finest("No data, waiting");
 					}
 				} else if (rel < 0) {
 					// Error!
@@ -167,7 +167,7 @@ public class UInputController {
 						if (pfd.revents != 0) {
 							UInputDevice dev = devicesByFd.get(pfd.fd);
 							if (dev == null) {
-								LOG.warn("Could not find device for FD "
+								LOG.warning("Could not find device for FD "
 										+ pfd.fd);
 							} else {
 								try {

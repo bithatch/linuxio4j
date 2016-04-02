@@ -13,9 +13,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.logging.Logger;
 
 import com.nervepoint.linuxio.CLib.pollfd;
 import com.sun.jna.Native;
@@ -48,6 +46,8 @@ public class UInputDevice implements Closeable {
 
     private static final String SYSPROP_LINUXIO_POINTER_TYPES = "linuxio.pointer.types";
     private static final String INPUT_DEVICES = "linuxio.input.devices";
+    
+	final static Logger LOG = Logger.getLogger(UInputDevice.class.getName());
 
     public enum Type {
         EV_SYN(CLib.EV_SYN), EV_REL(CLib.EV_REL), EV_MSC(CLib.EV_MSC), EV_SND(CLib.EV_SND), EV_FF(CLib.EV_FF), EV_FF_STATUS(
@@ -580,8 +580,6 @@ public class UInputDevice implements Closeable {
         NAMES.put(Type.EV_REP, REPEATS);
     }
 
-    final static Logger LOG = LoggerFactory.getLogger(UInputDevice.class);
-
     private File file;
     private int fd;
     private boolean grabbed;
@@ -620,13 +618,13 @@ public class UInputDevice implements Closeable {
             }
 
             if (t == null) {
-                LOG.warn("Unknown event type in " + SYSPROP_LINUXIO_POINTER_TYPES + " property, '" + typeName + "'");
+                LOG.warning("Unknown event type in " + SYSPROP_LINUXIO_POINTER_TYPES + " property, '" + typeName + "'");
             } else {
                 List<UInputDevice> availableDevices = getAvailableDevices();
                 UInputDevice theDevice = null;
                 try {
                     for (UInputDevice dev : availableDevices) {
-                        LOG.debug(dev.getName());
+                        LOG.fine(dev.getName());
                         Map<Type, Set<Integer>> capabilties = dev.getCapabilties();
                         codes = capabilties.get(t);
                         if (t == Type.EV_REL) {
@@ -638,7 +636,7 @@ public class UInputDevice implements Closeable {
                                 continue;
                             }
                         }
-                        LOG.debug("Device has some " + t + " caps");
+                        LOG.fine("Device has some " + t + " caps");
                         codes = capabilties.get(Type.EV_KEY);
                         int buttons = 0;
                         for (Integer s : codes) {
@@ -680,7 +678,7 @@ public class UInputDevice implements Closeable {
      */
     public final static List<UInputDevice> getAllPointerDevices() throws IOException {
         Set<Integer> codes = null;
-        List<UInputDevice> pointerDevices = new ArrayList<>();
+        List<UInputDevice> pointerDevices = new ArrayList<UInputDevice>();
         //
         for (String typeName : System.getProperty(SYSPROP_LINUXIO_POINTER_TYPES,
             Type.EV_ABS.nativeType + "," + Type.EV_REL.nativeType).split(",")) {
@@ -694,11 +692,11 @@ public class UInputDevice implements Closeable {
             }
 
             if (t == null) {
-                LOG.warn("Unknown event type in " + SYSPROP_LINUXIO_POINTER_TYPES + " property, '" + typeName + "'");
+                LOG.warning("Unknown event type in " + SYSPROP_LINUXIO_POINTER_TYPES + " property, '" + typeName + "'");
             } else {
                 List<UInputDevice> availableDevices = getAvailableDevices();
                 for (UInputDevice dev : availableDevices) {
-                    LOG.debug(dev.getName());
+                    LOG.fine(dev.getName());
                     Map<Type, Set<Integer>> capabilties = dev.getCapabilties();
                     codes = capabilties.get(t);
                     if (t == Type.EV_REL) {
@@ -710,7 +708,7 @@ public class UInputDevice implements Closeable {
                             continue;
                         }
                     }
-                    LOG.debug("Device has some " + t + " caps");
+                    LOG.fine("Device has some " + t + " caps");
                     codes = capabilties.get(Type.EV_KEY);
                     int buttons = 0;
                     for (Integer s : codes) {
@@ -736,7 +734,7 @@ public class UInputDevice implements Closeable {
      * @return keyboard device names
      */
     public final static List<String> getAllKeyboardDeviceNames() throws IOException {
-        List<String> keyboardDeviceNames = new ArrayList<>();
+        List<String> keyboardDeviceNames = new ArrayList<String>();
         List<UInputDevice> availableDevices = getAvailableDevices();
         try {
             for (UInputDevice dev : availableDevices) {
@@ -775,7 +773,7 @@ public class UInputDevice implements Closeable {
      * @return keyboard devices
      */
     public final static List<UInputDevice> getAllKeyboardDevices() throws IOException {
-        List<UInputDevice> keyboardDevices = new ArrayList<>();
+        List<UInputDevice> keyboardDevices = new ArrayList<UInputDevice>();
         for (UInputDevice dev : getAvailableDevices()) {
             LOG.info(dev.getName());
             Set<Integer> codes = dev.getCapabilties().get(Type.EV_KEY);
@@ -871,7 +869,7 @@ public class UInputDevice implements Closeable {
      * @return
      */
     public final static List<UInputDevice> getAvailableDevices() throws IOException {
-        final List<UInputDevice> d = new ArrayList<>();
+        final List<UInputDevice> d = new ArrayList<UInputDevice>();
         File dir = getInputDeviceDirectory();
         if (dir.exists()) {
             if (dir.canRead()) {
@@ -964,12 +962,12 @@ public class UInputDevice implements Closeable {
             Type t = Type.fromNative(i);
             Set<Integer> c = caps.get(t);
             if (test_bit(i, bit[0])) {
-                LOG.debug(String.format("  Event type %d (%s)\n", i, Type.fromNative((short) i)));
+                LOG.fine(String.format("  Event type %d (%s)\n", i, Type.fromNative((short) i)));
                 // if (!i) continue;
                 CLib.INSTANCE.ioctl(fd, CLib.Macros.EVIOCGBIT(i, CLib.KEY_MAX), bit[i]);
                 for (int j = 0; j < CLib.KEY_MAX; j++) {
                     if (test_bit(j, bit[i])) {
-                        LOG.debug(String.format("    Event code %d (%s)", j,
+                        LOG.fine(String.format("    Event code %d (%s)", j,
                             NAMES.containsKey(t) && NAMES.get(t).containsKey(j) ? NAMES.get(t).get(j) : ""));
                         if (c == null) {
                             c = new HashSet<Integer>();
@@ -980,7 +978,7 @@ public class UInputDevice implements Closeable {
                             CLib.INSTANCE.ioctl(fd, CLib.Macros.EVIOCGABS(j), abs);
                             for (int k = 0; k < 5; k++) {
                                 if ((k < 3) || abs[k] > 0) {
-                                    LOG.debug(String.format("      %s %6d", ABSVAL[k], abs[k]));
+                                    LOG.fine(String.format("      %s %6d", ABSVAL[k], abs[k]));
                                 }
                             }
                         }
@@ -995,7 +993,7 @@ public class UInputDevice implements Closeable {
     }
 
     private void open(File file) {
-        LOG.debug("Opening device " + file + " for " + getClass());
+        LOG.fine("Opening device " + file + " for " + getClass());
         fd = CLib.INSTANCE.open(file.getAbsolutePath(), CLib.O_RDWR | CLib.O_NOCTTY);
         if (fd == -1) {
             throw new RuntimeException(file + " is not a valid input device for " + getClass());
@@ -1048,7 +1046,7 @@ public class UInputDevice implements Closeable {
         if (grabbed) {
             throw new IllegalStateException("Already grabbed " + file + ".");
         }
-        LOG.debug("Grabbing " + file);
+        LOG.fine("Grabbing " + file);
 
         // EVIOCGRAB = 0x40044590
         if (CLib.INSTANCE.ioctl(fd, 0x40044590, 1) == -1) {
@@ -1058,7 +1056,7 @@ public class UInputDevice implements Closeable {
                 throw new IOException("Failed to grab.");
             }
         } else {
-            LOG.debug("Grabbed " + file);
+            LOG.fine("Grabbed " + file);
             grabbed = true;
         }
     }
@@ -1072,9 +1070,9 @@ public class UInputDevice implements Closeable {
         if (!grabbed) {
             throw new IllegalStateException("Not grabbed " + file + ".");
         }
-        LOG.debug("Ungrabbing " + file);
+        LOG.fine("Ungrabbing " + file);
         CLib.INSTANCE.ioctl(fd, 0x40044590, 0);
-        LOG.debug("Ungrabbed " + file);
+        LOG.fine("Ungrabbed " + file);
         grabbed = false;
     }
 
@@ -1096,7 +1094,7 @@ public class UInputDevice implements Closeable {
     public Event nextEvent() throws IOException {
         CLib.input_event ev = new CLib.input_event();
         int size = ev.size();
-        LOG.debug("Waiting for event (" + size + " bytes)");
+        LOG.fine("Waiting for event (" + size + " bytes)");
         Pointer pointer = ev.getPointer();
         NativeLong read = CLib.INSTANCE.read(fd, pointer, new NativeLong(size));
         // ev.read();
@@ -1119,9 +1117,9 @@ public class UInputDevice implements Closeable {
             if (grabbed) {
                 ungrab();
             }
-            LOG.debug("Closing device " + file);
+            LOG.fine("Closing device " + file);
             CLib.INSTANCE.close(fd);
-            LOG.debug("Closed device " + file);
+            LOG.fine("Closed device " + file);
         } finally {
             open = false;
         }

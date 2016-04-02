@@ -45,9 +45,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.sun.jna.NativeLong;
 import com.sun.jna.Pointer;
@@ -83,7 +82,7 @@ import com.sun.jna.Pointer;
  */
 public class FrameBuffer implements Closeable {
 
-	final static Logger LOG = LoggerFactory.getLogger(FrameBuffer.class);
+	final static Logger LOG = Logger.getLogger(FrameBuffer.class.getName());
 
 	static int FBIOGET_VSCREENINFO = 0x4600;
 	static int FBIOPUT_VSCREENINFO = 0x4601;
@@ -151,7 +150,7 @@ public class FrameBuffer implements Closeable {
 			try {
 				l.add(new FrameBuffer(f));
 			} catch (IOException ioe) {
-				LOG.info("Could not open " + f + ", skipping", ioe);
+				LOG.log(Level.INFO, "Could not open " + f + ", skipping", ioe);
 			}
 		}
 		return Collections.unmodifiableList(l);
@@ -252,7 +251,7 @@ public class FrameBuffer implements Closeable {
 					pw.close();
 				}
 			} catch (IOException ioe) {
-				LOG.warn("Failed to hide system cursor", ioe);
+				LOG.log(Level.WARNING, "Failed to hide system cursor", ioe);
 			}
 		}
 	}
