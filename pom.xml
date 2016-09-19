@@ -23,7 +23,7 @@
 * Frame Buffer. Write directly to the Linux framebuffer. Allows graphical user interfaces without X being present.</description>
 	<artifactId>linuxio4j</artifactId>
 	<groupId>com.nervepoint</groupId>
-	<version>1.1</version>
+	<version>1.2-SNAPSHOT</version>
 
 	<build>
 		<sourceDirectory>src/main/java</sourceDirectory>
@@ -186,6 +186,10 @@
 			<id>sonatype</id>
 			<name>Sonatype OSS Snapshots Repository</name>
 			<url>http://oss.sonatype.org/content/groups/public</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots/>
 		</repository>
 	</repositories>
 	<pluginRepositories>
@@ -193,6 +197,10 @@
 			<id>sonatype</id>
 			<name>Sonatype OSS Snapshots Repository</name>
 			<url>http://oss.sonatype.org/content/groups/public</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots/>
 		</pluginRepository>
 	</pluginRepositories>
 </project>
