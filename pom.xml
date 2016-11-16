@@ -182,7 +182,7 @@
 			</snapshots>
 		</repository>
 
-		<repository>
+		<!-- <repository>
 			<id>sonatype</id>
 			<name>Sonatype OSS Snapshots Repository</name>
 			<url>http://oss.sonatype.org/content/groups/public</url>
@@ -190,10 +190,10 @@
 				<enabled>false</enabled>
 			</releases>
 			<snapshots/>
-		</repository>
+		</repository> -->
 	</repositories>
 	<pluginRepositories>
-		<pluginRepository>
+		<!-- <pluginRepository>
 			<id>sonatype</id>
 			<name>Sonatype OSS Snapshots Repository</name>
 			<url>http://oss.sonatype.org/content/groups/public</url>
@@ -201,6 +201,6 @@
 				<enabled>false</enabled>
 			</releases>
 			<snapshots/>
-		</pluginRepository>
+		</pluginRepository> -->
 	</pluginRepositories>
 </project>
