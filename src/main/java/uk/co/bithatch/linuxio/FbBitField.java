@@ -1,4 +1,4 @@
-package com.nervepoint.linuxio;
+package uk.co.bithatch.linuxio;
 
 /* LinuxIO4J - A Java library for working with Linux I/O systems.
  * 

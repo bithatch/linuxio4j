@@ -1,206 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<maven.compiler.target>1.7</maven.compiler.target>
-		<maven.compiler.source>1.7</maven.compiler.source>
-
-		<!-- Distribution properties. -->
-
-		<releasesRepositoryLocation>http://artifactory.javassh.com/nervepoint-releases</releasesRepositoryLocation>
-		<snapshotsRepositoryLocation>http://artifactory.javassh.com/nervepoint-snapshots</snapshotsRepositoryLocation>
-
-		<siteDeploymentLocation>sftp://root@artifactory.javassh.com/var/www/nervepoint-site
-		</siteDeploymentLocation>
-	</properties>
-
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>uk.co.bithatch</groupId>
+	
 	<name>Linux I/O For Java</name>
 	<description>A JNA based library providing access to some low-level Linux subsystems, including :-
 
 * UInput. Read events from various devices such as keyboards, mice, touchpads, and all other devices exposed by Linux through uinput
 
-* Frame Buffer. Write directly to the Linux framebuffer. Allows graphical user interfaces without X being present.</description>
+* Frame Buffer. Write directly to the Linux framebuffer. Allows graphical user interfaces without X being present.
+
+As from version 2.0, this library is now in uk.co.bithatch namespace, and only supports Java 9 and above.</description>
 	<artifactId>linuxio4j</artifactId>
-	<groupId>com.nervepoint</groupId>
-	<version>1.2-SNAPSHOT</version>
+	<version>2.0-SNAPSHOT</version>
+	
+	<url>https://github.com/bithatch/linuxio4j</url>
+
+	<!-- Output to jar format -->
+	<packaging>jar</packaging>
+
+	<properties>
+		<maven.compiler.source>9</maven.compiler.source>
+		<maven.compiler.target>9</maven.compiler.target>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+	
+	<licenses>
+		<license>
+			<name>The Apache Software License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+	<scm>
+		<url>https://github.com/brett-smith/FX-BorderlessScene/</url>
+		<connection>scm:git:https://github.com/brett-smith/FX-BorderlessScene.git</connection>
+		<developerConnection>scm:git:https://github.com/brett-smith/FX-BorderlessScene.git</developerConnection>
+	</scm>
+	<developers>
+		<developer>
+			<id>brett</id>
+			<name>Brett Smith</name>
+			<email>tanktarta@gmail.com</email>
+		</developer>
+	</developers>
+
+	<distributionManagement>
+		<snapshotRepository>
+			<id>ossrh-bithatch</id>
+			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+		</snapshotRepository>
+		<repository>
+			<id>ossrh-bithatch</id>
+			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+		</repository>
+	</distributionManagement>
 
 	<build>
-		<sourceDirectory>src/main/java</sourceDirectory>
-		<testSourceDirectory>src/test/java</testSourceDirectory>
-		<outputDirectory>target/classes</outputDirectory>
-		<testOutputDirectory>target/test-classes</testOutputDirectory>
+		<sourceDirectory>${project.basedir}/src/main/java</sourceDirectory>
 		<resources>
 			<resource>
-				<targetPath>.</targetPath>
-				<directory>src/main/resources</directory>
+				<directory>${project.basedir}/src/main/resources</directory>
 			</resource>
 		</resources>
-		<testResources>
-			<testResource>
-				<targetPath>.</targetPath>
-				<directory>src/test/resources</directory>
-			</testResource>
-		</testResources>
+		<!-- <testSourceDirectory>testing</testSourceDirectory> -->
 		<plugins>
+
+			<!-- Source Code Plugin -->
 			<plugin>
-				<groupId>com.nativelibs4java</groupId>
-				<artifactId>maven-jnaerator-plugin</artifactId>
-				<version>0.12-SNAPSHOT</version>
-				<configuration>
-					<javaOutputDirectory>src/main/java</javaOutputDirectory>
-				</configuration>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>3.0.1</version>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
+
+			<!-- JavaDoc Plugin -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>3.1.0</version>
+				<executions>
+					<execution>
+						<id>attach-javadocs</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!-- Maven Compiler Plugin -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.8.0</version>
 				<configuration>
-					<source>1.6</source>
-					<target>1.6</target>
+					<source>9</source>
+					<target>9</target>
+					<encoding>UTF-8</encoding>
 				</configuration>
 			</plugin>
+
+			<!-- Make this jar executable -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.4</version>
+				<version>3.0.2</version>
 				<configuration>
 					<archive>
-						<index>true</index>
 						<manifest>
 							<addClasspath>true</addClasspath>
-							<mainClass>com.nervepoint.linuxio.tools.LinuxIO</mainClass>
+							<mainClass>com.goxr3plus.fxborderlessscene.application.Main</mainClass>
 						</manifest>
-						<manifestEntries>
-							<mode>development</mode>
-							<url>${project.url}</url>
-							<key>value</key>
-						</manifestEntries>
 					</archive>
 				</configuration>
 			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-gpg-plugin</artifactId>
+				<version>1.6</version>
+				<executions>
+					<execution>
+						<id>sign-artifacts</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>sign</goal>
+						</goals>
+						<configuration>
+							<gpgArguments>
+								<arg>--pinentry-mode</arg>
+								<arg>loopback</arg>
+							</gpgArguments>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			
+			<plugin>
+				<groupId>org.sonatype.plugins</groupId>
+				<artifactId>nexus-staging-maven-plugin</artifactId>
+				<version>1.6.8</version>
+				<extensions>true</extensions>
+				<configuration>
+					<serverId>ossrh-bithatch</serverId>
+					<nexusUrl>https://oss.sonatype.org/</nexusUrl>
+					<autoReleaseAfterClose>true</autoReleaseAfterClose>
+				</configuration>
+			</plugin>
+			<plugin>
+	            <groupId>org.codehaus.mojo</groupId>
+	            <artifactId>exec-maven-plugin</artifactId>
+	            <version>3.0.0</version>
+	            <configuration>
+	                <mainClass>uk.co.bithatch.linuxio.tools.LinuxIO</mainClass>
+	            </configuration>
+	        </plugin>
 		</plugins>
 	</build>
-
-	<profiles>
-		<profile>
-			<id>uberjar</id>
-			<activation>
-				<property>
-					<name>uber</name>
-					<value>true</value>
-				</property>
-			</activation>
-			<build>
-				<finalName>${project.artifactId}</finalName>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-shade-plugin</artifactId>
-						<version>2.4</version>
-						<executions>
-							<execution>
-								<phase>package</phase>
-								<goals>
-									<goal>shade</goal>
-								</goals>
-								<configuration>
-									<filters>
-										<filter>
-											<artifact>*:*</artifact>
-											<excludes>
-												<exclude>META-INF/*.SF</exclude>
-												<exclude>META-INF/*.DSA</exclude>
-												<exclude>META-INF/*.RSA</exclude>
-												<exclude>**/*.jar</exclude>
-											</excludes>
-										</filter>
-									</filters>
-									<transformers>
-										<transformer
-											implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-											<manifestEntries>
-												<Main-Class>com.nervepoint.linuxio.tools.LinuxIO</Main-Class>
-												<Class-Path></Class-Path>
-											</manifestEntries>
-										</transformer>
-									</transformers>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
-
-	<distributionManagement>
-		<repository>
-			<uniqueVersion>false</uniqueVersion>
-			<id>nervepoint-releases</id>
-			<name>Nervepoint Releases</name>
-			<url>${releasesRepositoryLocation}</url>
-			<layout>default</layout>
-		</repository>
-		<snapshotRepository>
-			<uniqueVersion>true</uniqueVersion>
-			<id>nervepoint-snapshots</id>
-			<name>Nervepoint Snapshots</name>
-			<url>${snapshotsRepositoryLocation}</url>
-			<layout>default</layout>
-		</snapshotRepository>
-		<site>
-			<id>nervepoint-site</id>
-			<url>${siteDeploymentLocation}/${project.artifactId}/</url>
-		</site>
-	</distributionManagement>
-
-
 	<dependencies>
 		<dependency>
 			<groupId>net.java.dev.jna</groupId>
 			<artifactId>jna</artifactId>
-			<!-- <version>3.5.2</version> -->
-			<version>4.1.0</version>
-			<type>jar</type>
-			<scope>compile</scope>
-		</dependency>
-
+	        <version>5.3.1</version>
+	    </dependency>
+	    <dependency>
+	        <groupId>net.java.dev.jna</groupId>
+	        <artifactId>jna-platform</artifactId>
+	        <version>5.3.1</version>
+	    </dependency>
 	</dependencies>
-	<repositories>
-
-
-		<!-- Central Maven plugin repository - This is here as a work around to 
-			try and stop Maven from loading SLF4J from Sonatype first .. which returns 
-			a MOVED .. which Maven still ignores and so you end up with corrupted Jars 
-			. -->
-
-		<repository>
-			<id>repo1</id>
-			<url>http://repo1.maven.org/maven2</url>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-
-		<!-- <repository>
-			<id>sonatype</id>
-			<name>Sonatype OSS Snapshots Repository</name>
-			<url>http://oss.sonatype.org/content/groups/public</url>
-			<releases>
-				<enabled>false</enabled>
-			</releases>
-			<snapshots/>
-		</repository> -->
-	</repositories>
-	<pluginRepositories>
-		<!-- <pluginRepository>
-			<id>sonatype</id>
-			<name>Sonatype OSS Snapshots Repository</name>
-			<url>http://oss.sonatype.org/content/groups/public</url>
-			<releases>
-				<enabled>false</enabled>
-			</releases>
-			<snapshots/>
-		</pluginRepository> -->
-	</pluginRepositories>
 </project>
+

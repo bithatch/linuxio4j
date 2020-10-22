@@ -1,4 +1,4 @@
-package com.nervepoint.linuxio;
+package uk.co.bithatch.linuxio;
 
 /* LinuxIO4J - A Java library for working with Linux I/O systems.
  * 
@@ -41,12 +41,12 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import com.sun.jna.NativeLong;
 import com.sun.jna.Pointer;
@@ -71,18 +71,16 @@ import com.sun.jna.Pointer;
  * g.setColor(Color.red);
  * g.drawRect(10, 10, 50, 50);
  * fbdev.commit();
- * </code>
- * The framebuffer may also operate in <i>Direct Mode</i>. In this case, the
- * backing image memory is mapped directly to the framebuffer memory. This 
+ * </code> The framebuffer may also operate in <i>Direct Mode</i>. In this case,
+ * the backing image memory is mapped directly to the framebuffer memory. This
  * is way more efficient and means you do not need to call {@link #commit()}
- * after every write.
- * <code>
+ * after every write. <code>
  * fb.setMapDirect(true);
  * </code>
  */
 public class FrameBuffer implements Closeable {
 
-	final static Logger LOG = Logger.getLogger(FrameBuffer.class.getName());
+	final static Logger LOG = System.getLogger(FrameBuffer.class.getName());
 
 	static int FBIOGET_VSCREENINFO = 0x4600;
 	static int FBIOPUT_VSCREENINFO = 0x4601;
@@ -104,8 +102,7 @@ public class FrameBuffer implements Closeable {
 
 	private final static CLib C_LIBRARY = CLib.INSTANCE;
 
-	public final static File DEVICES_DIR = new File(System.getProperty(
-			"linuxio.frameBufferDeviceDirectory", "/dev"));
+	public final static File DEVICES_DIR = new File(System.getProperty("linuxio.frameBufferDeviceDirectory", "/dev"));
 
 	private Buffer buffer;
 	private Object lock = new Object();
@@ -118,8 +115,7 @@ public class FrameBuffer implements Closeable {
 	 * @return opened framebuffer
 	 * @throws IOException on any error opening the framebuffer
 	 */
-	public static FrameBuffer getFrameBuffer(String deviceFileName)
-			throws IOException {
+	public static FrameBuffer getFrameBuffer(String deviceFileName) throws IOException {
 		File deviceFile = new File(deviceFileName);
 		return new FrameBuffer(deviceFile);
 	}
@@ -138,13 +134,12 @@ public class FrameBuffer implements Closeable {
 	 * Get and open all of the framebuffers available.
 	 * 
 	 * @return list of opened framebuffers
-	 * @throws IOException on any error enumerating or opening the 
+	 * @throws IOException on any error enumerating or opening the
 	 */
 	public static List<FrameBuffer> getFrameBuffers() throws IOException {
 		List<FrameBuffer> l = new ArrayList<FrameBuffer>();
 		if (!DEVICES_DIR.exists()) {
-			throw new RuntimeException("Directory " + DEVICES_DIR
-					+ " does not exist.");
+			throw new RuntimeException("Directory " + DEVICES_DIR + " does not exist.");
 		}
 		for (File f : DEVICES_DIR.listFiles(createFilter())) {
 			try {
@@ -162,8 +157,7 @@ public class FrameBuffer implements Closeable {
 			public boolean accept(File pathname) {
 				boolean fb = pathname.getName().startsWith("fb");
 				if (fb && !pathname.canRead()) {
-					LOG.info("Skipping " + pathname
-							+ " because it is not readable.");
+					LOG.log(Level.INFO, "Skipping " + pathname + " because it is not readable.");
 					return false;
 				}
 				return fb;
@@ -175,8 +169,7 @@ public class FrameBuffer implements Closeable {
 	private FbFixedScreenInfo fixedScreenInfo;
 	private Pointer frameBuffer;
 	private int fh;
-	private boolean mapDirect = "true".equals(System
-			.getProperty("linuxio.frameBuffer.mapDirect"));
+	private boolean mapDirect = "true".equals(System.getProperty("linuxio.frameBuffer.mapDirect"));
 
 	private FbVariableScreenInfo varScreenInfo;
 
@@ -188,9 +181,7 @@ public class FrameBuffer implements Closeable {
 		fh = C_LIBRARY.open(deviceFile.getAbsolutePath(), CLib.O_RDWR);
 		try {
 			if (C_LIBRARY.ioctl(fh, FBIOGET_FSCREENINFO, fixedScreenInfo) < 0) {
-				throw new IOException("ioctl(" + fh
-						+ ", FBIOGET_FSCREENINFO, &size) failed [" + deviceFile
-						+ "]");
+				throw new IOException("ioctl(" + fh + ", FBIOGET_FSCREENINFO, &size) failed [" + deviceFile + "]");
 			}
 		} catch (IOException ioe) {
 			C_LIBRARY.close(fh);
@@ -198,20 +189,17 @@ public class FrameBuffer implements Closeable {
 		}
 
 		// Mmap the device file, this is where we write the image data
-		frameBuffer = CLib.INSTANCE.mmap(null, new NativeLong(
-				fixedScreenInfo.smem_len), CLib.PROT_READ | CLib.PROT_WRITE,
-				CLib.MAP_SHARED, fh, new NativeLong(0));
+		frameBuffer = CLib.INSTANCE.mmap(null, new NativeLong(fixedScreenInfo.smem_len),
+				CLib.PROT_READ | CLib.PROT_WRITE, CLib.MAP_SHARED, fh, new NativeLong(0));
 	}
 
 	/**
 	 * Set whether the standard input, output and error streams are output. This
 	 * convenience method is provided because output on the console can will
-	 * overwrite anything you write to the framebuffer (probably not what you
-	 * want).
+	 * overwrite anything you write to the framebuffer (probably not what you want).
 	 * 
-	 * @param visible
-	 *            whether standard input, output and errors streams are visible
-	 *            on the console where the application was launched
+	 * @param visible whether standard input, output and errors streams are visible
+	 *                on the console where the application was launched
 	 */
 	public static void setStandardStreamsVisible(boolean visible) {
 		if (!visible && currentOut == null) {
@@ -260,16 +248,14 @@ public class FrameBuffer implements Closeable {
 	 * Get the color map to use when using an indexed colour mode.
 	 * 
 	 * @return color map
-	 * @throws IOException
-	 *             on any I/O readng the color map
+	 * @throws IOException on any I/O readng the color map
 	 */
 	public FbColorMap getColorMap() throws IOException {
 		synchronized (lock) {
 			FbColorMap map = new FbColorMap(256);
 			int ioctl = C_LIBRARY.ioctl(fh, FBIOGETCMAP, map);
 			if (ioctl < 0) {
-				throw new IOException("ioctl(" + fh
-						+ ", FBIOGETCMAP, &size) failed = " + ioctl);
+				throw new IOException("ioctl(" + fh + ", FBIOGETCMAP, &size) failed = " + ioctl);
 			}
 			return map;
 		}
@@ -278,29 +264,25 @@ public class FrameBuffer implements Closeable {
 	/**
 	 * Set the color map to use when using an indexed colour mode.
 	 * 
-	 * @param map
-	 *            color map
-	 * @throws IOException
-	 *             on any I/O writing the new color map
+	 * @param map color map
+	 * @throws IOException on any I/O writing the new color map
 	 */
 	public void setColorMap(FbColorMap map) throws IOException {
 		// TODO this does not work!
 		synchronized (lock) {
 			int ioctl = C_LIBRARY.ioctl(fh, FBIOPUTCMAP, map);
 			if (ioctl < 0) {
-				throw new IOException("ioctl(" + fh
-						+ ", FBIOSETCMAP, &size) failed = " + ioctl);
+				throw new IOException("ioctl(" + fh + ", FBIOSETCMAP, &size) failed = " + ioctl);
 			}
 		}
 	}
 
 	/**
-	 * Get the variable screen info. Details encapsulated by this object may
-	 * change during the life of the frame buffer.
+	 * Get the variable screen info. Details encapsulated by this object may change
+	 * during the life of the frame buffer.
 	 * 
 	 * @return variable screen info
-	 * @throws IOException
-	 *             on any I/O reading the screen info
+	 * @throws IOException on any I/O reading the screen info
 	 */
 	public FbVariableScreenInfo getVariableScreenInfo() throws IOException {
 		synchronized (lock) {
@@ -308,8 +290,7 @@ public class FrameBuffer implements Closeable {
 			if (varScreenInfo == null) {
 				varScreenInfo = new FbVariableScreenInfo();
 				if (C_LIBRARY.ioctl(fh, FBIOGET_VSCREENINFO, varScreenInfo) < 0) {
-					throw new IOException("ioctl(" + fh
-							+ ", FBIOGET_VSCREENINFO, &size) failed");
+					throw new IOException("ioctl(" + fh + ", FBIOGET_VSCREENINFO, &size) failed");
 				}
 			}
 			return varScreenInfo;
@@ -317,11 +298,11 @@ public class FrameBuffer implements Closeable {
 	}
 
 	/**
-	 * Get a {@link Graphics} object that may be drawn on, with results either
-	 * going to the backing image ({@link #isMapDirect()} is false) or directly
-	 * to the framebuffer ({@link #isMapDirect()} is true). When writing to the
-	 * backing image, you must call {@link #commit()} to send the backing image
-	 * to the framebuffer.
+	 * Get a {@link Graphics} object that may be drawn on, with results either going
+	 * to the backing image ({@link #isMapDirect()} is false) or directly to the
+	 * framebuffer ({@link #isMapDirect()} is true). When writing to the backing
+	 * image, you must call {@link #commit()} to send the backing image to the
+	 * framebuffer.
 	 * 
 	 * @return graphics
 	 */
@@ -335,19 +316,18 @@ public class FrameBuffer implements Closeable {
 	/**
 	 * Write an image to the backing image or the framebuffer directly (if
 	 * {@link #isMapDirect()} is true). When not in direct mode, you should call
-	 * {@link #commit} to see the written image. You may call this multiple
-	 * times before commiting.
+	 * {@link #commit} to see the written image. You may call this multiple times
+	 * before commiting.
 	 * 
-	 * @param image
-	 *            image to draw onto the backing image or the framebuffer
+	 * @param image image to draw onto the backing image or the framebuffer
 	 * @throws IOException
 	 */
 	public void write(BufferedImage image) throws IOException {
 		synchronized (lock) {
 			Graphics2D graphics = getGraphics();
 			FbVariableScreenInfo screenInfo = getVariableScreenInfo();
-			graphics.drawImage(image, 0, 0, screenInfo.xres, screenInfo.yres,
-					0, 0, image.getWidth(), image.getHeight(), null);
+			graphics.drawImage(image, 0, 0, screenInfo.xres, screenInfo.yres, 0, 0, image.getWidth(), image.getHeight(),
+					null);
 			if (!isMapDirect()) {
 				commit();
 			}
@@ -355,12 +335,11 @@ public class FrameBuffer implements Closeable {
 	}
 
 	/**
-	 * Get whether the backing image is mapped directly to the framebuffer
-	 * memory. In this mode, any write to the graphics returned byte
-	 * {@link #getGraphics()}, or any image drawn using
-	 * {@link #write(BufferedImage)} will occur directly on the framebuffer.
-	 * This will increase performance and negate the need to call {@#commit()
-	 * } when you want to send the backing image to the framebuffer.
+	 * Get whether the backing image is mapped directly to the framebuffer memory.
+	 * In this mode, any write to the graphics returned byte {@link #getGraphics()},
+	 * or any image drawn using {@link #write(BufferedImage)} will occur directly on
+	 * the framebuffer. This will increase performance and negate the need to call
+	 * {@link FrameBuffer#commit()} when you want to send the backing image to the framebuffer.
 	 * 
 	 * @return map backing image directly to framebuffer memory
 	 */
@@ -369,15 +348,13 @@ public class FrameBuffer implements Closeable {
 	}
 
 	/**
-	 * Set whether the backing image is mapped directly to the framebuffer
-	 * memory. In this mode, any write to the graphics returned byte
-	 * {@link #getGraphics()}, or any image drawn using
-	 * {@link #write(BufferedImage)} will occur directly on the framebuffer.
-	 * This will increase performance and negate the need to call {@#commit()
-	 * } when you want to send the backing image to the framebuffer.
+	 * Set whether the backing image is mapped directly to the framebuffer memory.
+	 * In this mode, any write to the graphics returned byte {@link #getGraphics()},
+	 * or any image drawn using {@link #write(BufferedImage)} will occur directly on
+	 * the framebuffer. This will increase performance and negate the need to call
+	 * {@link FrameBuffer#commit()} when you want to send the backing image to the framebuffer.
 	 * 
-	 * @param mapDirect
-	 *            map backing image directly to framebuffer memory
+	 * @param mapDirect map backing image directly to framebuffer memory
 	 * @see #isMapDirect()
 	 */
 	public void setMapDirect(boolean mapDirect) {
@@ -386,10 +363,9 @@ public class FrameBuffer implements Closeable {
 
 	/**
 	 * Commit a specific area of the backing image to the frame buffer. See
-	 * {@link #commit()} for more information.
+	 * {@link FrameBuffer#commit()} for more information.
 	 * 
-	 * @param area
-	 *            area of backing image to commit to the framebuffer
+	 * @param area area of backing image to commit to the framebuffer
 	 * @throws IOException
 	 */
 	public void commit(Rectangle area) throws IOException {
@@ -409,8 +385,7 @@ public class FrameBuffer implements Closeable {
 			}
 
 			// If commiting entire screen, we can optimise a bit
-			if (area.width == buffer.image.getWidth()
-					&& area.height == buffer.image.getHeight() && area.x == 0
+			if (area.width == buffer.image.getWidth() && area.height == buffer.image.getHeight() && area.x == 0
 					&& area.y == 0) {
 				commit();
 				return;
@@ -422,36 +397,32 @@ public class FrameBuffer implements Closeable {
 			switch (fbs.bits_per_pixel) {
 			case 8:
 				for (int y = 0; y < area.height; y++) {
-					frameBuffer.write(offset * bps, buffer.byteBuffer, offset,
-							area.width);
+					frameBuffer.write(offset * bps, buffer.byteBuffer, offset, area.width);
 					offset += buffer.image.getWidth();
 				}
 				break;
 			case 16:
 				for (int y = 0; y < area.height; y++) {
-					frameBuffer.write(offset * bps, buffer.shortBuffer, offset,
-							area.width);
+					frameBuffer.write(offset * bps, buffer.shortBuffer, offset, area.width);
 					offset += buffer.image.getWidth();
 				}
 				break;
 			case 24:
 			case 32:
 				for (int y = 0; y < area.height; y++) {
-					frameBuffer.write(offset * bps, buffer.intBuffer, offset,
-							area.width);
+					frameBuffer.write(offset * bps, buffer.intBuffer, offset, area.width);
 					offset += buffer.image.getWidth();
 				}
 				break;
 			default:
-				throw new UnsupportedOperationException("Unknown bpp "
-						+ fbs.bits_per_pixel);
+				throw new UnsupportedOperationException("Unknown bpp " + fbs.bits_per_pixel);
 			}
 		}
 	}
 
 	/**
-	 * Commit the current backing image to the framebuffer. Typically used after
-	 * a call has been made to {@link #getGraphics}, which is then used to draw
+	 * Commit the current backing image to the framebuffer. Typically used after a
+	 * call has been made to {@link #getGraphics}, which is then used to draw
 	 * several primitives, and finally sending the changed backing image to the
 	 * framebuffer with a {@link #commit()}.
 	 * 
@@ -466,21 +437,17 @@ public class FrameBuffer implements Closeable {
 			FbVariableScreenInfo fbs = getVariableScreenInfo();
 			switch (fbs.bits_per_pixel) {
 			case 8:
-				frameBuffer.write(0, buffer.byteBuffer, 0,
-						buffer.byteBuffer.length);
+				frameBuffer.write(0, buffer.byteBuffer, 0, buffer.byteBuffer.length);
 				break;
 			case 16:
-				frameBuffer.write(0, buffer.shortBuffer, 0,
-						buffer.shortBuffer.length);
+				frameBuffer.write(0, buffer.shortBuffer, 0, buffer.shortBuffer.length);
 				break;
 			case 24:
 			case 32:
-				frameBuffer.write(0, buffer.intBuffer, 0,
-						buffer.intBuffer.length);
+				frameBuffer.write(0, buffer.intBuffer, 0, buffer.intBuffer.length);
 				break;
 			default:
-				throw new UnsupportedOperationException("Unknown bpp "
-						+ fbs.bits_per_pixel);
+				throw new UnsupportedOperationException("Unknown bpp " + fbs.bits_per_pixel);
 			}
 		}
 	}
@@ -498,10 +465,8 @@ public class FrameBuffer implements Closeable {
 	/**
 	 * Create a image compatible with the image backing this framebuffer.
 	 * 
-	 * @param w
-	 *            width of image
-	 * @param h
-	 *            height of image
+	 * @param w width of image
+	 * @param h height of image
 	 * @return image
 	 * @throws IOException
 	 */
@@ -528,8 +493,7 @@ public class FrameBuffer implements Closeable {
 		bounds = new Rectangle(0, 0, screenInfo.xres, screenInfo.yres);
 	}
 
-	private Buffer createBuffer(int w, int h, FbVariableScreenInfo screenInfo)
-			throws IOException {
+	private Buffer createBuffer(int w, int h, FbVariableScreenInfo screenInfo) throws IOException {
 		Buffer buffer = new Buffer();
 
 		if (screenInfo.grayscale == 0) {
@@ -538,14 +502,12 @@ public class FrameBuffer implements Closeable {
 			int gmask = (0xff & screenInfo.green.getMax()) << screenInfo.green.offset;
 			int bmask = (0xff & screenInfo.blue.getMax()) << screenInfo.blue.offset;
 
-			LOG.info("Creating Direct " + screenInfo.bits_per_pixel
-					+ " bit colour model");
-			LOG.info("RED  : "
-					+ toBinaryString(screenInfo.bits_per_pixel, rmask));
-			LOG.info("GREEN: "
-					+ toBinaryString(screenInfo.bits_per_pixel, gmask));
-			LOG.info("BLUE : "
-					+ toBinaryString(screenInfo.bits_per_pixel, bmask));
+			if (LOG.isLoggable(Level.DEBUG)) {
+				LOG.log(Level.DEBUG, "Creating Direct " + screenInfo.bits_per_pixel + " bit colour model");
+				LOG.log(Level.DEBUG, "RED  : " + toBinaryString(screenInfo.bits_per_pixel, rmask));
+				LOG.log(Level.DEBUG, "GREEN: " + toBinaryString(screenInfo.bits_per_pixel, gmask));
+				LOG.log(Level.DEBUG, "BLUE : " + toBinaryString(screenInfo.bits_per_pixel, bmask));
+			}
 
 			DataBuffer dataBuffer = null;
 			SampleModel sampleModel = null;
@@ -560,11 +522,9 @@ public class FrameBuffer implements Closeable {
 			switch (screenInfo.bits_per_pixel) {
 			case 8:
 				if (mapDirect) {
-					dataBuffer = new DataBufferByte(frameBuffer.getByteBuffer(
-							0, w * h).array(), w * h, 0);
+					dataBuffer = new DataBufferByte(frameBuffer.getByteBuffer(0, w * h).array(), w * h, 0);
 				} else {
-					dataBuffer = new DataBufferByte(
-							buffer.byteBuffer = new byte[w * h], w * h, 0);
+					dataBuffer = new DataBufferByte(buffer.byteBuffer = new byte[w * h], w * h, 0);
 				}
 
 				// byte[] webLevels = { 0, 51, 102, (byte) 153, (byte) 204,
@@ -649,50 +609,40 @@ public class FrameBuffer implements Closeable {
 					r[i] = (byte) redC[i];
 					b[i] = (byte) greenC[i];
 					g[i] = (byte) blueC[i];
-					LOG.info("I= " + i + " R=" + r[i] + " G=" + g[i] + " B="
-							+ b[i]);
+					if (LOG.isLoggable(Level.DEBUG))
+						LOG.log(Level.DEBUG, "I= " + i + " R=" + r[i] + " G=" + g[i] + " B=" + b[i]);
 				}
 
 				colorModel = new IndexColorModel(8, r.length, r, g, b, 0);
 
-				sampleModel = new PixelInterleavedSampleModel(
-						DataBuffer.TYPE_BYTE, w, h, 1, w, new int[] { 0 });
+				sampleModel = new PixelInterleavedSampleModel(DataBuffer.TYPE_BYTE, w, h, 1, w, new int[] { 0 });
 
 				break;
 			case 16:
 				if (mapDirect) {
-					dataBuffer = new DataBufferUShort(frameBuffer
-							.getByteBuffer(0, w * h * 2).asShortBuffer()
-							.array(), w * h, 0);
+					dataBuffer = new DataBufferUShort(frameBuffer.getByteBuffer(0, w * h * 2).asShortBuffer().array(),
+							w * h, 0);
 				} else {
-					dataBuffer = new DataBufferUShort(
-							buffer.shortBuffer = new short[w * h], w * h, 0);
+					dataBuffer = new DataBufferUShort(buffer.shortBuffer = new short[w * h], w * h, 0);
 				}
-				sampleModel = new SinglePixelPackedSampleModel(
-						DataBuffer.TYPE_USHORT, w, h, new int[] { rmask, gmask,
-								bmask });
-				colorModel = new DirectColorModel(screenInfo.bits_per_pixel,
-						rmask, gmask, bmask);
+				sampleModel = new SinglePixelPackedSampleModel(DataBuffer.TYPE_USHORT, w, h,
+						new int[] { rmask, gmask, bmask });
+				colorModel = new DirectColorModel(screenInfo.bits_per_pixel, rmask, gmask, bmask);
 				break;
 			case 24:
 			case 32:
 				if (mapDirect) {
-					dataBuffer = new DataBufferInt(frameBuffer
-							.getByteBuffer(0, w * h * 4).asIntBuffer().array(),
-							w * h, 0);
+					dataBuffer = new DataBufferInt(frameBuffer.getByteBuffer(0, w * h * 4).asIntBuffer().array(), w * h,
+							0);
 				} else {
-					dataBuffer = new DataBufferInt(buffer.intBuffer = new int[w
-							* h], w * h, 0);
+					dataBuffer = new DataBufferInt(buffer.intBuffer = new int[w * h], w * h, 0);
 				}
-				sampleModel = new SinglePixelPackedSampleModel(
-						DataBuffer.TYPE_INT, w, h, new int[] { rmask, gmask,
-								bmask });
-				colorModel = new DirectColorModel(screenInfo.bits_per_pixel,
-						rmask, gmask, bmask);
+				sampleModel = new SinglePixelPackedSampleModel(DataBuffer.TYPE_INT, w, h,
+						new int[] { rmask, gmask, bmask });
+				colorModel = new DirectColorModel(screenInfo.bits_per_pixel, rmask, gmask, bmask);
 				break;
 			default:
-				throw new UnsupportedOperationException("Unsupported bpp "
-						+ screenInfo.bits_per_pixel);
+				throw new UnsupportedOperationException("Unsupported bpp " + screenInfo.bits_per_pixel);
 			}
 
 			raster = Raster.createWritableRaster(sampleModel, dataBuffer, null);
@@ -705,8 +655,7 @@ public class FrameBuffer implements Closeable {
 	}
 
 	private String toBinaryString(int s, int i) {
-		return String.format("%" + s + "s", Integer.toBinaryString(i)).replace(
-				' ', '0');
+		return String.format("%" + s + "s", Integer.toBinaryString(i)).replace(' ', '0');
 	}
 
 	@Override
@@ -716,8 +665,7 @@ public class FrameBuffer implements Closeable {
 			variableScreenInfo = getVariableScreenInfo();
 		} catch (IOException e) {
 		}
-		return "FrameBuffer [deviceFile=" + deviceFile
-				+ ", variableScreenInfo=" + variableScreenInfo
+		return "FrameBuffer [deviceFile=" + deviceFile + ", variableScreenInfo=" + variableScreenInfo
 				+ ", fixedScreenInfo=" + fixedScreenInfo + "]";
 	}
 
@@ -737,8 +685,7 @@ public class FrameBuffer implements Closeable {
 		C_LIBRARY.close(fh);
 	}
 
-	public void copyImageData(BufferedImage subimage, int sx, int sy, int x,
-			int y, int w, int h) {
+	public void copyImageData(BufferedImage subimage, int sx, int sy, int x, int y, int w, int h) {
 		int offset = (y * buffer.image.getWidth()) + x;
 		int soffset = (sy * subimage.getWidth()) + sx;
 		if (x + w > buffer.image.getWidth()) {
@@ -755,8 +702,7 @@ public class FrameBuffer implements Closeable {
 		}
 		switch (subimage.getData().getDataBuffer().getDataType()) {
 		case DataBuffer.TYPE_INT:
-			int[] intData = ((DataBufferInt) subimage.getData().getDataBuffer())
-					.getData();
+			int[] intData = ((DataBufferInt) subimage.getData().getDataBuffer()).getData();
 			for (int iy = 0; iy < h; iy++) {
 				System.arraycopy(intData, soffset, buffer.intBuffer, offset, w);
 				offset += buffer.image.getWidth();
@@ -764,22 +710,18 @@ public class FrameBuffer implements Closeable {
 			}
 			break;
 		case DataBuffer.TYPE_BYTE:
-			byte[] byteData = ((DataBufferByte) subimage.getData()
-					.getDataBuffer()).getData();
+			byte[] byteData = ((DataBufferByte) subimage.getData().getDataBuffer()).getData();
 			subimage.getData().getDataElements(sx, sy, w, h, byteData);
 			for (int iy = 0; iy < h; iy++) {
-				System.arraycopy(byteData, soffset, buffer.byteBuffer, offset,
-						w);
+				System.arraycopy(byteData, soffset, buffer.byteBuffer, offset, w);
 				offset += buffer.image.getWidth();
 				soffset += subimage.getWidth();
 			}
 			break;
 		case DataBuffer.TYPE_USHORT:
-			short[] shortData = ((DataBufferUShort) subimage.getData()
-					.getDataBuffer()).getData();
+			short[] shortData = ((DataBufferUShort) subimage.getData().getDataBuffer()).getData();
 			for (int iy = 0; iy < h; iy++) {
-				System.arraycopy(shortData, soffset, buffer.shortBuffer,
-						offset, w);
+				System.arraycopy(shortData, soffset, buffer.shortBuffer, offset, w);
 				offset += buffer.image.getWidth();
 				soffset += subimage.getWidth();
 			}

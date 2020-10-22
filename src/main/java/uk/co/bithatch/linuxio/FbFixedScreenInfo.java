@@ -1,4 +1,4 @@
-package com.nervepoint.linuxio;
+package uk.co.bithatch.linuxio;
 
 /* * LinuxIO4J - A Java library for working with Linux I/O systems.
  * 
@@ -18,11 +18,14 @@ package com.nervepoint.linuxio;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import java.util.Arrays;
-import java.util.List;
 
 import com.sun.jna.NativeLong;
 import com.sun.jna.Structure;
+import com.sun.jna.Structure.FieldOrder;
 
+@FieldOrder({"id", "smem_start", "smem_len", "type",
+				"type_aux", "visual", "xpanstep", "ypanstep", "ywrapstep",
+				"line_length", "mmio_start", "mmio_len", "accel", "reserved"})
 public class FbFixedScreenInfo extends Structure {
 	public byte[] id = new byte[16];
 	public NativeLong smem_start;
@@ -40,13 +43,6 @@ public class FbFixedScreenInfo extends Structure {
 	public short[] reserved = new short[3];
 
 	//
-
-	@Override
-	protected List<?> getFieldOrder() {
-		return Arrays.asList("id", "smem_start", "smem_len", "type",
-				"type_aux", "visual", "xpanstep", "ypanstep", "ywrapstep",
-				"line_length", "mmio_start", "mmio_len", "accel", "reserved");
-	}
 
 	@Override
 	public String toString() {

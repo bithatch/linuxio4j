@@ -1,4 +1,4 @@
-package com.nervepoint.linuxio.tools;
+package uk.co.bithatch.linuxio.tools;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -12,12 +12,11 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 
-import com.nervepoint.linuxio.CLib;
-import com.nervepoint.linuxio.FbColorMap;
-import com.nervepoint.linuxio.FbVariableScreenInfo;
-import com.nervepoint.linuxio.FrameBuffer;
-import com.nervepoint.linuxio.UInputDevice;
-import com.nervepoint.linuxio.UInputDevice.Event;
+import uk.co.bithatch.linuxio.CLib;
+import uk.co.bithatch.linuxio.FbVariableScreenInfo;
+import uk.co.bithatch.linuxio.FrameBuffer;
+import uk.co.bithatch.linuxio.UInputDevice;
+import uk.co.bithatch.linuxio.UInputDevice.Event;
 
 public class LinuxIO {
 

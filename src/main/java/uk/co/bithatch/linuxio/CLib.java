@@ -1,4 +1,4 @@
-package com.nervepoint.linuxio;
+package uk.co.bithatch.linuxio;
 
 /*
  * LinuxIO4J - A Java library for working with Linux I/O systems.
@@ -27,6 +27,7 @@ import com.sun.jna.NativeLibrary;
 import com.sun.jna.NativeLong;
 import com.sun.jna.Pointer;
 import com.sun.jna.Structure;
+import com.sun.jna.Structure.FieldOrder;
 import com.sun.jna.ptr.IntByReference;
 
 /**
@@ -39,7 +40,7 @@ public interface CLib extends com.sun.jna.Library {
 			.isWindows() ? "msvcrt" : "c");
 	public static final NativeLibrary JNA_NATIVE_LIB = NativeLibrary
 			.getInstance(CLib.JNA_LIBRARY_NAME);
-	public static final CLib INSTANCE = (CLib) Native.loadLibrary(
+	public static final CLib INSTANCE = Native.load(
 			CLib.JNA_LIBRARY_NAME, CLib.class);
 
 	public static final int PROT_WRITE = (int) 0x2;
@@ -822,6 +823,7 @@ public interface CLib extends com.sun.jna.Library {
 		}
 	}
 
+	@FieldOrder({"tv_sec", "tv_usec"})
 	class timeval extends Structure {
 		/**
 		 * Seconds.<br>
@@ -836,10 +838,6 @@ public interface CLib extends com.sun.jna.Library {
 
 		public timeval() {
 			super();
-		}
-
-		protected List<?> getFieldOrder() {
-			return Arrays.asList("tv_sec", "tv_usec");
 		}
 
 		/**
@@ -871,6 +869,7 @@ public interface CLib extends com.sun.jna.Library {
 		};
 	}
 
+	@FieldOrder({"time", "type", "code", "value"})
 	class input_event extends Structure {
 		/** C type : timeval */
 		public timeval time;
@@ -883,10 +882,6 @@ public interface CLib extends com.sun.jna.Library {
 
 		public input_event() {
 			super();
-		}
-
-		protected List<?> getFieldOrder() {
-			return Arrays.asList("time", "type", "code", "value");
 		}
 
 		/**

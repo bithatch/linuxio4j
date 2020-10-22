@@ -1,9 +1,9 @@
-package com.nervepoint.linuxio.tools;
+package uk.co.bithatch.linuxio.tools;
 
-import com.nervepoint.linuxio.UInputController;
-import com.nervepoint.linuxio.UInputController.Callback;
-import com.nervepoint.linuxio.UInputDevice.Event;
-import com.nervepoint.linuxio.UInputDevice;
+import uk.co.bithatch.linuxio.UInputController;
+import uk.co.bithatch.linuxio.UInputDevice;
+import uk.co.bithatch.linuxio.UInputController.Callback;
+import uk.co.bithatch.linuxio.UInputDevice.Event;
 
 public class TestPoll {
 

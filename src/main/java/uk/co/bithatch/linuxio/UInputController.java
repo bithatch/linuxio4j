@@ -1,16 +1,16 @@
-package com.nervepoint.linuxio;
+package uk.co.bithatch.linuxio;
 
 import java.io.EOFException;
 import java.io.IOException;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Semaphore;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-import com.nervepoint.linuxio.CLib.pollfd;
-import com.nervepoint.linuxio.UInputDevice.Event;
+import uk.co.bithatch.linuxio.CLib.pollfd;
+import uk.co.bithatch.linuxio.UInputDevice.Event;
 
 /**
  * Manages keyboard and mouse input devices. This is the recommended way to
@@ -31,7 +31,7 @@ import com.nervepoint.linuxio.UInputDevice.Event;
  */
 public class UInputController {
 
-	final static Logger LOG = Logger.getLogger(UInputController.class.getName());
+	final static Logger LOG = System.getLogger(UInputController.class.getName());
 
 	public interface Callback {
 		void event(UInputDevice device, Event event);
@@ -54,12 +54,11 @@ public class UInputController {
 	}
 
 	/**
-	 * Remove a device. The callback registered will no longer receive events,
-	 * and if this is the last device being removed, the polling thread will be
+	 * Remove a device. The callback registered will no longer receive events, and
+	 * if this is the last device being removed, the polling thread will be
 	 * shutdown.
 	 * 
-	 * @param device
-	 *            device to remove.
+	 * @param device device to remove.
 	 */
 	public void remove(UInputDevice device) {
 		try {
@@ -68,7 +67,8 @@ public class UInputController {
 					throw new IllegalArgumentException("No such device.");
 				}
 
-				LOG.info("Removing device " + device + " from UInput polling");
+				if (LOG.isLoggable(Level.DEBUG))
+					LOG.log(Level.DEBUG, "Removing device " + device + " from UInput polling");
 
 				if (devices.size() == 1) {
 					// We will be closing
@@ -89,38 +89,36 @@ public class UInputController {
 				}
 			}
 		} catch (Exception e) {
-			throw new RuntimeException(
-					"Failed to remove UInput device from polling.");
+			throw new RuntimeException("Failed to remove UInput device from polling.");
 		}
 
-		LOG.info("Removed device " + device + " from UInput polling");
+		if (LOG.isLoggable(Level.DEBUG))
+			LOG.log(Level.DEBUG, "Removed device " + device + " from UInput polling");
 	}
 
 	/**
 	 * Add a new device to be monitored for events, calling the
-	 * {@link Callback#event(UInputDevice, Event)} method of the provided
-	 * callback.
+	 * {@link Callback#event(UInputDevice, Event)} method of the provided callback.
 	 * <p>
 	 * If this is the first device to be added, the polling thread will also be
 	 * started.
 	 * 
-	 * @param device
-	 *            device to monitor
-	 * @param callback
-	 *            callback invoked when event arrives for this device
+	 * @param device   device to monitor
+	 * @param callback callback invoked when event arrives for this device
 	 */
 	public void add(UInputDevice device, Callback callback) {
 		synchronized (devices) {
 			devices.put(device, callback);
 			devicesByFd.put(device.getFD(), device);
 			if (devices.size() == 1) {
-				LOG.info("Starting UInput polling");
+				if (LOG.isLoggable(Level.DEBUG))
+					LOG.log(Level.DEBUG, "Starting UInput polling");
 				Thread t = new Thread("UInput") {
 					public void run() {
 						try {
 							poll();
 						} catch (IOException e) {
-							LOG.log(Level.SEVERE, "Failed to poll.", e);
+							LOG.log(Level.ERROR, "Failed to poll.", e);
 						}
 					}
 				};
@@ -128,7 +126,8 @@ public class UInputController {
 				t.setDaemon(true);
 				t.start();
 			}
-			LOG.info("Added " + device + " to polling");
+			if (LOG.isLoggable(Level.DEBUG))
+				LOG.log(Level.DEBUG, "Added " + device + " to polling");
 		}
 	}
 
@@ -137,8 +136,7 @@ public class UInputController {
 			while (devices.size() > 0) {
 				if (pollFds == null || pollFds.length != devices.size()) {
 					synchronized (devices) {
-						pollFds = (CLib.pollfd[]) new CLib.pollfd()
-								.toArray(devices.size());
+						pollFds = (CLib.pollfd[]) new CLib.pollfd().toArray(devices.size());
 						int i = 0;
 						for (UInputDevice dev : devices.keySet()) {
 							// pollfd pfd = new CLib.pollfd();
@@ -155,8 +153,8 @@ public class UInputController {
 				int rel = CLib.INSTANCE.poll(pollFds, pollFds.length, 1000);
 				if (rel == 0) {
 					// Timeout, no data, just loop
-					if (LOG.isLoggable(Level.FINEST)) {
-						LOG.finest("No data, waiting");
+					if (LOG.isLoggable(Level.TRACE)) {
+						LOG.log(Level.TRACE, "No data, waiting");
 					}
 				} else if (rel < 0) {
 					// Error!
@@ -167,8 +165,7 @@ public class UInputController {
 						if (pfd.revents != 0) {
 							UInputDevice dev = devicesByFd.get(pfd.fd);
 							if (dev == null) {
-								LOG.warning("Could not find device for FD "
-										+ pfd.fd);
+								LOG.log(Level.WARNING, "Could not find device for FD " + pfd.fd);
 							} else {
 								try {
 									Event event = dev.nextEvent();
@@ -185,7 +182,8 @@ public class UInputController {
 			}
 		} finally {
 			semaphore.release();
-			LOG.info("No long polling for UInput events");
+			if (LOG.isLoggable(Level.DEBUG))
+				LOG.log(Level.DEBUG, "No long polling for UInput events");
 		}
 	}
 

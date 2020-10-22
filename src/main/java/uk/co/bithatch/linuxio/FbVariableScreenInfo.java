@@ -1,4 +1,4 @@
-package com.nervepoint.linuxio;
+package uk.co.bithatch.linuxio;
 
 /* LinuxIO4J - A Java library for working with Linux I/O systems.
  * 
@@ -18,10 +18,16 @@ package com.nervepoint.linuxio;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import java.util.Arrays;
-import java.util.List;
 
 import com.sun.jna.Structure;
+import com.sun.jna.Structure.FieldOrder;
 
+@FieldOrder({"xres", "yres", "xres_virtual", "yres_virtual",
+				"xoffset", "yoffset", "bits_per_pixel", "grayscale", "red",
+				"green", "blue", "transp", "nonstd", "activate", "height",
+				"width", "accel_flags", "pixclock", "left_margin",
+				"right_margin", "upper_margin", "lower_margin", "hsync_len",
+				"vsync_len", "sync", "vmode", "reserved"})
 public class FbVariableScreenInfo extends Structure {
 	public int xres;
 	public int yres;
@@ -57,16 +63,6 @@ public class FbVariableScreenInfo extends Structure {
 	public int sync;
 	public int vmode;
 	public int[] reserved = new int[6];
-
-	@Override
-	protected List<?> getFieldOrder() {
-		return Arrays.asList("xres", "yres", "xres_virtual", "yres_virtual",
-				"xoffset", "yoffset", "bits_per_pixel", "grayscale", "red",
-				"green", "blue", "transp", "nonstd", "activate", "height",
-				"width", "accel_flags", "pixclock", "left_margin",
-				"right_margin", "upper_margin", "lower_margin", "hsync_len",
-				"vsync_len", "sync", "vmode", "reserved");
-	}
 
 	@Override
 	public String toString() {
