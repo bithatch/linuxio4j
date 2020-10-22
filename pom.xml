@@ -14,7 +14,7 @@
 
 As from version 2.0, this library is now in uk.co.bithatch namespace, and only supports Java 9 and above.</description>
 	<artifactId>linuxio4j</artifactId>
-	<version>2.0-SNAPSHOT</version>
+	<version>2.0</version>
 	
 	<url>https://github.com/bithatch/linuxio4j</url>
 
