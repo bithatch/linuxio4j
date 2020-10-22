@@ -43,6 +43,7 @@ import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -71,12 +72,7 @@ import com.sun.jna.Pointer;
  * g.setColor(Color.red);
  * g.drawRect(10, 10, 50, 50);
  * fbdev.commit();
- * </code> The framebuffer may also operate in <i>Direct Mode</i>. In this case,
- * the backing image memory is mapped directly to the framebuffer memory. This
- * is way more efficient and means you do not need to call {@link #commit()}
- * after every write. <code>
- * fb.setMapDirect(true);
- * </code>
+ * </code> 
  */
 public class FrameBuffer implements Closeable {
 
@@ -107,6 +103,19 @@ public class FrameBuffer implements Closeable {
 	private Buffer buffer;
 	private Object lock = new Object();
 	private Rectangle bounds;
+
+	/**
+	 * Get and open the first available frame buffer or throw an exceptioon.
+	 * 
+	 * @return opened framebuffer
+	 * @throws IOException on any error opening the framebuffer
+	 */
+	public static FrameBuffer getFrameBuffer() throws IOException {
+		List<File> l = getFrameBufferFiles();
+		if(l.isEmpty())
+			throw new IOException("No frame buffers found.");
+		return new FrameBuffer(l.get(0));
+	}
 
 	/**
 	 * Get a single framebuffer given its device filename
@@ -169,9 +178,8 @@ public class FrameBuffer implements Closeable {
 	private FbFixedScreenInfo fixedScreenInfo;
 	private Pointer frameBuffer;
 	private int fh;
-	private boolean mapDirect = "true".equals(System.getProperty("linuxio.frameBuffer.mapDirect"));
-
 	private FbVariableScreenInfo varScreenInfo;
+	private ByteBuffer nativeBuffer;
 
 	private FrameBuffer(File deviceFile) throws IOException {
 		this.deviceFile = deviceFile;
@@ -243,6 +251,20 @@ public class FrameBuffer implements Closeable {
 			}
 		}
 	}
+	
+	/**
+	 * Get the {@link ByteBuffer} that backs this frame buffer. 
+	 * 
+	 * @return buffer
+	 * @throws IOException 
+	 */
+	public ByteBuffer getBuffer() throws IOException {
+		if(nativeBuffer == null) {
+			FbVariableScreenInfo screenInfo = getVariableScreenInfo();
+			nativeBuffer = frameBuffer.getByteBuffer(0, screenInfo.xres * screenInfo.yres * Math.max(1, screenInfo.bits_per_pixel / 8));
+		}
+		return nativeBuffer;
+	}
 
 	/**
 	 * Get the color map to use when using an indexed colour mode.
@@ -298,11 +320,7 @@ public class FrameBuffer implements Closeable {
 	}
 
 	/**
-	 * Get a {@link Graphics} object that may be drawn on, with results either going
-	 * to the backing image ({@link #isMapDirect()} is false) or directly to the
-	 * framebuffer ({@link #isMapDirect()} is true). When writing to the backing
-	 * image, you must call {@link #commit()} to send the backing image to the
-	 * framebuffer.
+	 * Get a {@link Graphics} object that may be drawn on.
 	 * 
 	 * @return graphics
 	 */
@@ -328,37 +346,8 @@ public class FrameBuffer implements Closeable {
 			FbVariableScreenInfo screenInfo = getVariableScreenInfo();
 			graphics.drawImage(image, 0, 0, screenInfo.xres, screenInfo.yres, 0, 0, image.getWidth(), image.getHeight(),
 					null);
-			if (!isMapDirect()) {
-				commit();
-			}
+			commit();
 		}
-	}
-
-	/**
-	 * Get whether the backing image is mapped directly to the framebuffer memory.
-	 * In this mode, any write to the graphics returned byte {@link #getGraphics()},
-	 * or any image drawn using {@link #write(BufferedImage)} will occur directly on
-	 * the framebuffer. This will increase performance and negate the need to call
-	 * {@link FrameBuffer#commit()} when you want to send the backing image to the framebuffer.
-	 * 
-	 * @return map backing image directly to framebuffer memory
-	 */
-	public boolean isMapDirect() {
-		return mapDirect;
-	}
-
-	/**
-	 * Set whether the backing image is mapped directly to the framebuffer memory.
-	 * In this mode, any write to the graphics returned byte {@link #getGraphics()},
-	 * or any image drawn using {@link #write(BufferedImage)} will occur directly on
-	 * the framebuffer. This will increase performance and negate the need to call
-	 * {@link FrameBuffer#commit()} when you want to send the backing image to the framebuffer.
-	 * 
-	 * @param mapDirect map backing image directly to framebuffer memory
-	 * @see #isMapDirect()
-	 */
-	public void setMapDirect(boolean mapDirect) {
-		this.mapDirect = mapDirect;
 	}
 
 	/**
@@ -370,9 +359,6 @@ public class FrameBuffer implements Closeable {
 	 */
 	public void commit(Rectangle area) throws IOException {
 		synchronized (lock) {
-			if (isMapDirect()) {
-				throw new IllegalStateException("Not allowed to map direct.");
-			}
 			checkBufferImage();
 
 			// Keep the rectangle within bounds
@@ -430,9 +416,6 @@ public class FrameBuffer implements Closeable {
 	 */
 	public void commit() throws IOException {
 		synchronized (lock) {
-			if (isMapDirect()) {
-				throw new IllegalStateException("Not allowed to map direct.");
-			}
 			checkBufferImage();
 			FbVariableScreenInfo fbs = getVariableScreenInfo();
 			switch (fbs.bits_per_pixel) {
@@ -476,7 +459,7 @@ public class FrameBuffer implements Closeable {
 			return createBuffer(w, h, screenInfo).image;
 		}
 	}
-
+	
 	private void checkBufferImage() {
 		try {
 			if (buffer == null || buffer.image == null) {
@@ -521,11 +504,7 @@ public class FrameBuffer implements Closeable {
 			ColorModel colorModel;
 			switch (screenInfo.bits_per_pixel) {
 			case 8:
-				if (mapDirect) {
-					dataBuffer = new DataBufferByte(frameBuffer.getByteBuffer(0, w * h).array(), w * h, 0);
-				} else {
-					dataBuffer = new DataBufferByte(buffer.byteBuffer = new byte[w * h], w * h, 0);
-				}
+				dataBuffer = new DataBufferByte(buffer.byteBuffer = new byte[w * h], w * h, 0);
 
 				// byte[] webLevels = { 0, 51, 102, (byte) 153, (byte) 204,
 				// (byte) 255 };
@@ -619,24 +598,14 @@ public class FrameBuffer implements Closeable {
 
 				break;
 			case 16:
-				if (mapDirect) {
-					dataBuffer = new DataBufferUShort(frameBuffer.getByteBuffer(0, w * h * 2).asShortBuffer().array(),
-							w * h, 0);
-				} else {
-					dataBuffer = new DataBufferUShort(buffer.shortBuffer = new short[w * h], w * h, 0);
-				}
+				dataBuffer = new DataBufferUShort(buffer.shortBuffer = new short[w * h], w * h, 0);
 				sampleModel = new SinglePixelPackedSampleModel(DataBuffer.TYPE_USHORT, w, h,
 						new int[] { rmask, gmask, bmask });
 				colorModel = new DirectColorModel(screenInfo.bits_per_pixel, rmask, gmask, bmask);
 				break;
 			case 24:
 			case 32:
-				if (mapDirect) {
-					dataBuffer = new DataBufferInt(frameBuffer.getByteBuffer(0, w * h * 4).asIntBuffer().array(), w * h,
-							0);
-				} else {
-					dataBuffer = new DataBufferInt(buffer.intBuffer = new int[w * h], w * h, 0);
-				}
+				dataBuffer = new DataBufferInt(buffer.intBuffer = new int[w * h], w * h, 0);
 				sampleModel = new SinglePixelPackedSampleModel(DataBuffer.TYPE_INT, w, h,
 						new int[] { rmask, gmask, bmask });
 				colorModel = new DirectColorModel(screenInfo.bits_per_pixel, rmask, gmask, bmask);
@@ -647,6 +616,7 @@ public class FrameBuffer implements Closeable {
 
 			raster = Raster.createWritableRaster(sampleModel, dataBuffer, null);
 			buffer.image = new BufferedImage(colorModel, raster, false, null);
+			
 			return buffer;
 		} else {
 			throw new UnsupportedOperationException();

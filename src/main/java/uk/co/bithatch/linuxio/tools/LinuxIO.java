@@ -7,8 +7,10 @@ import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import javax.imageio.ImageIO;
 
@@ -51,9 +53,7 @@ public class LinuxIO {
                 g.setColor(Color.WHITE);
                 g.setFont(new Font("Monospaced", Font.BOLD, 32));
                 g.drawString(String.format("FPS: %3.1f",fps), 30, 50);
-                if(!fb.isMapDirect()) {
-                    fb.commit();
-                }
+                fb.commit();
             }
         } finally {
             fb.close();
@@ -61,6 +61,30 @@ public class LinuxIO {
     }
 
     public static void main3(BufferedReader reader) throws Exception {
+        for (int i = 0; i < 80; i++) {
+            System.out.println();
+        }
+        FrameBuffer fb = FrameBuffer.getFrameBuffers().get(0);
+        try {
+        	ByteBuffer buf = fb.getBuffer();
+        	int y = fb.getVariableScreenInfo().yres;
+        	int w = fb.getVariableScreenInfo().xres * Math.max(1, fb.getVariableScreenInfo().bits_per_pixel / 8);
+        	Random rnd = new Random();
+    		byte[] row = new byte[w];
+            for (int j = 1; j < 10000; j++) {
+            	buf.rewind();
+            	for(int k = 0 ; k < y; k++) {
+                	rnd.nextBytes(row);
+                	buf.put(row);
+            	}
+            		
+            }
+        } finally {
+            fb.close();
+        }
+    }
+
+    public static void main4(BufferedReader reader) throws Exception {
         for (int i = 0; i < 80; i++) {
             System.out.println();
         }
@@ -81,7 +105,7 @@ public class LinuxIO {
         }
     }
 
-    public static void main4(BufferedReader reader) throws Exception {
+    public static void main5(BufferedReader reader) throws Exception {
         UInputDevice dev = UInputDevice.getFirstKeyboardDevice();
         System.out.println(dev);
         boolean grab = false;
@@ -131,7 +155,7 @@ public class LinuxIO {
         }
     }
 
-    public static void main5(BufferedReader reader) throws Exception {
+    public static void main6(BufferedReader reader) throws Exception {
         UInputDevice firstPointerDevice = UInputDevice.getFirstPointerDevice();
         System.out.println(firstPointerDevice);
         boolean grab = false;
@@ -180,7 +204,7 @@ public class LinuxIO {
         }
     }
 
-    public static void main6(BufferedReader reader) throws Exception {
+    public static void main7(BufferedReader reader) throws Exception {
         for (UInputDevice d : UInputDevice.getAvailableDevices()) {
             System.out.println(d);
         }
@@ -207,7 +231,7 @@ public class LinuxIO {
     public static void main(String[] args) throws Exception {
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         while (true) {
-            int opt = menu(reader, "FB List GraphicsDevice", "FB random colours (full speed)", "FB Test Card", "UINPUT Keyboard",
+            int opt = menu(reader, "FB List GraphicsDevice", "FB random colours (full speed)", "FB noise (direct to buffer)","FB Test Card", "UINPUT Keyboard",
                 "UINPUT Pointer", "UINPUT All");
             if (opt == 0) {
                 return;

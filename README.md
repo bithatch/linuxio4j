@@ -46,8 +46,62 @@ To integrate with your own project, here are some basics.
 
 ### Framebuffer
 
-TODO
+To find all the frame buffer devices :-
+
+```java
+List<FrameBuffer> fbs = FrameBuffer.getFrameBuffers();
+```
+
+To get the resolution of a buffer device :-
+
+```java
+	try(FrameBuffer fb = FrameBuffer.getFrameBuffer()) {
+		int xres = fb.getVariableScreenInfo().xres;
+		int yres = fb.getVariableScreenInfo().xres;
+		System.out.println("The buffer is " + xres + " x " + yres);
+	}
+```
+
+To write a whole screen of random noise directly to the display :-
+
+```java
+	try(FrameBuffer fb = FrameBuffer.getFrameBuffer()) {
+	
+		/* Get a whole page of random numbers *.
+		byte[] rnd = new byte[fb.getVariableScreenInfo().yres * fb.getVariableScreenInfo().xres * Math.max(1, fb.getVariableScreenInfo().bits_per_pixel / 8)];
+		new Random().nextBytes(rnd);
+		
+		/* Write the noise */
+		fb.getBuffer().put(rnd);
+	}
+	
+```
+
+To get a `Graphics` to draw on :-
+
+```java
+	try(FrameBuffer fb = FrameBuffer.getFrameBuffer()) {
+		Graphics2D g = fb.getGraphics();
+		g.setColor(Color.RED);
+		g.drawRect(100, 100, 400, 400);
+		fb.commit();
+	}
+	
+```
 
 ### UInput
 
-TODO
+To grab and read mouse events :-
+
+```java
+       try(UInputDevice mouse = UInputDevice.getFirstPointerDevice()) {
+	        mouse.grab();
+	        while (true) {
+				Event ev = mouse.nextEvent();
+				if (ev == null) {
+					break;
+				}
+				System.out.println(ev);
+			}
+		}
+```
