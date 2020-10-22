@@ -332,12 +332,9 @@ public class FrameBuffer implements Closeable {
 	}
 
 	/**
-	 * Write an image to the backing image or the framebuffer directly (if
-	 * {@link #isMapDirect()} is true). When not in direct mode, you should call
-	 * {@link #commit} to see the written image. You may call this multiple times
-	 * before commiting.
+	 * Write an image to the backing image 
 	 * 
-	 * @param image image to draw onto the backing image or the framebuffer
+	 * @param image image to draw onto the backing image
 	 * @throws IOException
 	 */
 	public void write(BufferedImage image) throws IOException {
