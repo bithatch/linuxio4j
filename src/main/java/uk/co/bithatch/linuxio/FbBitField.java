@@ -32,7 +32,7 @@ public class FbBitField extends Structure {
 	private int max; /* max value (calculated from length) */
 
 	@Override
-	protected List getFieldOrder() {
+	protected List<String> getFieldOrder() {
 		return Arrays.asList("offset", "length", "msb_right");
 	}
 

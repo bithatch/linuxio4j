@@ -1,5 +1,6 @@
 module uk.co.bithatch.linuxio {
-	requires java.desktop;
+	requires transitive java.desktop;
 	requires transitive com.sun.jna;
 	requires transitive com.sun.jna.platform;
+	exports uk.co.bithatch.linuxio;
 }
