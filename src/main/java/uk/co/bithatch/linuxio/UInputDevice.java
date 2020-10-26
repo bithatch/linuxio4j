@@ -94,6 +94,10 @@ public class UInputDevice implements Closeable {
 			this(ev.time.tv_usec.longValue() * 1000, Type.fromNative(ev.type), ev.code, ev.value);
 		}
 
+		public Event(Type type, int code) {
+			this(type, code, 0);
+		}
+
 		public Event(Type type, int code, int value) {
 			this(0, type, code, value);
 		}
@@ -1143,7 +1147,7 @@ public class UInputDevice implements Closeable {
 	 * Add a capability to an event type. Only relevant when creating a new virtual
 	 * device, and must be done before the call is made to {@link #open()}.
 	 */
-	public void addCapbility(Type eventType, Integer... keys) {
+	public void addCapability(Type eventType, Integer... keys) {
 		Map<Type, Set<Integer>> caps = getCapabilities();
 		Set<Integer> current = caps.get(eventType);
 		if (current == null) {
