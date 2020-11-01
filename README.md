@@ -81,7 +81,7 @@ To write a whole screen of random noise directly to the display :-
 ```java
 	try(FrameBuffer fb = FrameBuffer.getFrameBuffer()) {
 	
-		/* Get a whole page of random numbers *.
+		/* Get a whole page of random numbers */
 		byte[] rnd = new byte[fb.getVariableScreenInfo().yres * fb.getVariableScreenInfo().xres * Math.max(1, fb.getVariableScreenInfo().bits_per_pixel / 8)];
 		new Random().nextBytes(rnd);
 		
@@ -118,6 +118,7 @@ To grab and read mouse events :-
 			System.out.println(ev);
 		}
 	}
+   }
 ```
 
 To create a new virtual keyboard device and emit some keys :-
