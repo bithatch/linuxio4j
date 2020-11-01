@@ -1,10 +1,7 @@
-package uk.co.bithatch.linuxio;
-
-/*
- * LinuxIO4J - A Java library for working with Linux I/O systems.
- * 
- * Copyright (C) 2015 - Nervepoint Technologies
- *  
+/**
+ * Linux I/O For Java - A JNA based library providing access to some low-level Linux subsystems
+ * Copyright © 2012 Bithatch (tanktarta@gmail.com)
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -16,8 +13,9 @@ package uk.co.bithatch.linuxio;
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+package uk.co.bithatch.linuxio;
 
 import java.util.Arrays;
 import java.util.List;

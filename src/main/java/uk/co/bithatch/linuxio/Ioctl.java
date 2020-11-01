@@ -1,22 +1,19 @@
-/*
- * 
- * Based on Python IOCTL (https://python-ioctl.readthedocs.io/en/stable/_modules/ioctl/linux.html#IOC)
- * 
- * Parts of this taken from Maven os-maven-plugin  (https://github.com/trustin/os-maven-plugin):-
- * 
- * Copyright 2014 Trustin Heuiseung Lee.
+/**
+ * Linux I/O For Java - A JNA based library providing access to some low-level Linux subsystems
+ * Copyright © 2012 Bithatch (tanktarta@gmail.com)
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package uk.co.bithatch.linuxio;
 
@@ -264,11 +261,11 @@ public class Ioctl {
 		int dir;
 		if (direction == null)
 			dir = calc._IOC_NONE;
-		else if (direction.equals("r"))
+		else if (direction.equals("r") || direction.equals("R"))
 			dir = calc._IOC_READ;
-		else if (direction.equals("w"))
+		else if (direction.equals("w") || direction.equals("W"))
 			dir = calc._IOC_WRITE;
-		else if (direction.equals("rw"))
+		else if (direction.equals("rw") || direction.equals("RW"))
 			dir = calc._IOC_READ | calc._IOC_WRITE;
 		else
 			throw new IllegalArgumentException("Direction must be null, 'r', 'w' or 'rw'.");

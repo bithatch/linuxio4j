@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>uk.co.bithatch</groupId>
-	
+
 	<name>Linux I/O For Java</name>
 	<description>A JNA based library providing access to some low-level Linux subsystems, including :-
 
@@ -15,7 +16,7 @@
 As from version 2.0, this library is now in uk.co.bithatch namespace, and only supports Java 9 and above.</description>
 	<artifactId>linuxio4j</artifactId>
 	<version>2.1-SNAPSHOT</version>
-	
+
 	<url>https://github.com/bithatch/linuxio4j</url>
 
 	<!-- Output to jar format -->
@@ -26,7 +27,7 @@ As from version 2.0, this library is now in uk.co.bithatch namespace, and only s
 		<maven.compiler.target>9</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
-	
+
 	<licenses>
 		<license>
 			<name>The Apache Software License, Version 2.0</name>
@@ -46,6 +47,11 @@ As from version 2.0, this library is now in uk.co.bithatch namespace, and only s
 			<email>tanktarta@gmail.com</email>
 		</developer>
 	</developers>
+	<inceptionYear>2012</inceptionYear>
+	<organization>
+		<name>Bithatch</name>
+		<url>http://bithatch.co.uk</url>
+	</organization>
 
 	<distributionManagement>
 		<snapshotRepository>
@@ -87,8 +93,15 @@ As from version 2.0, this library is now in uk.co.bithatch namespace, and only s
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>3.1.0</version>
+				<version>3.2.0</version>
 				<executions>
+					<execution>
+						<id>release</id>
+						<phase>package</phase>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
 					<execution>
 						<id>attach-javadocs</id>
 						<goals>
@@ -96,31 +109,67 @@ As from version 2.0, this library is now in uk.co.bithatch namespace, and only s
 						</goals>
 					</execution>
 				</executions>
+				<configuration>
+					<!-- <skip>true</skip> -->
+					<encoding>UTF-8</encoding>
+					<excludePackageNames>**.impl.*</excludePackageNames>
+					<!-- https://stackoverflow.com/questions/49472783/maven-is-unable-to-find-javadoc-command -->
+					<javadocExecutable>${java.home}/bin/javadoc</javadocExecutable>
+
+					<!-- https://bugs.openjdk.java.net/browse/JDK-8212233 -->
+					<source>8</source>
+				</configuration>
 			</plugin>
 
 			<!-- Maven Compiler Plugin -->
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.8.0</version>
-				<configuration>
-					<source>9</source>
-					<target>9</target>
-					<encoding>UTF-8</encoding>
-				</configuration>
+				<version>3.8.1</version>
+				<executions>
+					<execution>
+						<id>compile8</id>
+						<goals>
+							<goal>compile</goal>
+						</goals>
+						<configuration>
+							<source>1.8</source>
+							<target>1.8</target>
+						</configuration>
+					</execution>
+					<execution>
+						<id>compile9</id>
+						<phase>compile</phase>
+						<goals>
+							<goal>compile</goal>
+						</goals>
+						<configuration>
+							<release>9</release>
+							<compileSourceRoots>
+								<compileSourceRoot>${project.basedir}/src/main/java</compileSourceRoot>
+								<compileSourceRoot>${project.basedir}/src/main/java9</compileSourceRoot>
+							</compileSourceRoots>
+							<multiReleaseOutput>true</multiReleaseOutput>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 
 			<!-- Make this jar executable -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
-				<version>3.0.2</version>
+				<version>3.2.0</version>
 				<configuration>
 					<archive>
 						<manifest>
 							<addClasspath>true</addClasspath>
-							<mainClass>com.goxr3plus.fxborderlessscene.application.Main</mainClass>
+							<mainClass>uk.co.bithatch.linuxio.tools.LinuxIO</mainClass>
 						</manifest>
+						<manifestEntries>
+							<Multi-Release>true</Multi-Release>
+						</manifestEntries>
 					</archive>
 				</configuration>
 			</plugin>
@@ -145,7 +194,7 @@ As from version 2.0, this library is now in uk.co.bithatch namespace, and only s
 					</execution>
 				</executions>
 			</plugin>
-			
+
 			<plugin>
 				<groupId>org.sonatype.plugins</groupId>
 				<artifactId>nexus-staging-maven-plugin</artifactId>
@@ -158,26 +207,55 @@ As from version 2.0, this library is now in uk.co.bithatch namespace, and only s
 				</configuration>
 			</plugin>
 			<plugin>
-	            <groupId>org.codehaus.mojo</groupId>
-	            <artifactId>exec-maven-plugin</artifactId>
-	            <version>3.0.0</version>
-	            <configuration>
-	                <mainClass>uk.co.bithatch.linuxio.tools.LinuxIO</mainClass>
-	            </configuration>
-	        </plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>3.0.0</version>
+				<configuration>
+					<mainClass>uk.co.bithatch.linuxio.tools.LinuxIO</mainClass>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>com.mycila</groupId>
+				<artifactId>license-maven-plugin</artifactId>
+				<version>3.0</version>
+				<configuration>
+					<header>src/main/templates/GPL-3.txt</header>
+					<properties>
+						<owner>Bithatch</owner>
+						<email>tanktarta@gmail.com</email>
+					</properties>
+					<excludes>
+						<exclude>**/README</exclude>
+						<exclude>src/main/templates/**</exclude>
+						<exclude>pom.xml</exclude>
+						<exclude>src/test/resources/**</exclude>
+						<exclude>src/main/resources/**</exclude>
+					</excludes>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>format</goal>
+						</goals>
+						<id>licenses</id>
+						<phase>process-sources</phase>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
 	<dependencies>
 		<dependency>
 			<groupId>net.java.dev.jna</groupId>
 			<artifactId>jna</artifactId>
-	        <version>5.3.1</version>
-	    </dependency>
-	    <dependency>
-	        <groupId>net.java.dev.jna</groupId>
-	        <artifactId>jna-platform</artifactId>
-	        <version>5.3.1</version>
-	    </dependency>
+			<version>5.3.1</version>
+		</dependency>
+		<dependency>
+			<groupId>net.java.dev.jna</groupId>
+			<artifactId>jna-platform</artifactId>
+			<version>5.3.1</version>
+		</dependency>
 	</dependencies>
 </project>
 
