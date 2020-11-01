@@ -43,6 +43,7 @@ import com.sun.jna.ptr.IntByReference;
 
 import uk.co.bithatch.linuxio.CLib.pollfd;
 import uk.co.bithatch.linuxio.UInput.uinput_setup;
+import uk.co.bithatch.linuxio.UInputDevice.Event;
 
 /**
  * Provides access to the Linux linux user input system (uinput). All input
@@ -1256,6 +1257,56 @@ public class UInputDevice implements Closeable {
 			throw new IllegalStateException("This device is not a reading.");
 		}
 		return grabbed;
+	}
+
+	/**
+	 * Convenience method to press a key (SYN will be emitted).
+	 * 
+	 * @param code code of key to press 
+	 * @throws IOException on error
+	 */
+	public void pressKey(int code) throws IOException {
+		emit(new Event(UInputDevice.Type.EV_KEY, code, 1));
+	}
+
+	/**
+	 * Convenience method to press a key (SYN will be emitted).
+	 * 
+	 * @param code code of key to release
+	 * @throws IOException on error
+	 */
+	public void releaseKey(int code) throws IOException {
+		emit(new Event(UInputDevice.Type.EV_KEY, code, 0));
+	}
+
+	/**
+	 * Convenience method to type a key. The key will be pressed and released, with SYN
+	 * after each state, with a 1 millisecond delay.
+	 * 
+	 * @param code code of key to type
+	 * @throws IOException on error
+	 */
+	public void typeKey(int code) throws IOException {
+		typeKey(code, 1);
+	}
+
+	/**
+	 * Convenience method to type a key. The key will be pressed and released, with SYN
+	 * after each state, with an optional delay.
+	 * 
+	 * @param code code of key to type
+	 * @param delay delay in milliseconds
+	 * @throws IOException on error
+	 */
+	public void typeKey(int code, long delay) throws IOException {
+		pressKey(code);
+		if(delay >0)
+			try {
+				Thread.sleep(delay);
+			} catch (InterruptedException e) {
+				// If interrupted, don't leave the key pressed if at all possible
+			}
+		releaseKey(code);
 	}
 
 	/**
