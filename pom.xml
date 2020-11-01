@@ -39,9 +39,9 @@ As from version 2.0, this library is now in uk.co.bithatch namespace, and only s
 		</license>
 	</licenses>
 	<scm>
-		<url>https://github.com/brett-smith/FX-BorderlessScene/</url>
-		<connection>scm:git:https://github.com/brett-smith/FX-BorderlessScene.git</connection>
-		<developerConnection>scm:git:https://github.com/brett-smith/FX-BorderlessScene.git</developerConnection>
+		<url>https://github.com/bithatch/linuxio4j</url>
+		<connection>scm:git:https://github.com/bithatch/linuxio4j.git</connection>
+		<developerConnection>scm:git:https://github.com/bithatch/linuxio4j.git</developerConnection>
 	</scm>
 	<developers>
 		<developer>
