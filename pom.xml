@@ -9,7 +9,10 @@
 	<name>Linux I/O For Java</name>
 	<description>A JNA based library providing access to some low-level Linux subsystems, including :-
 
-* UInput. Read events from various devices such as keyboards, mice, touchpads, and all other devices exposed by Linux through uinput
+* UInput. Create virtual devices such as keyboards, mice and touchpads and emit events from them as if they
+  were real.
+
+* Evdev. Read events from various devices such as keyboards, mice, touchpads, and all other devices exposed by Linux.
 
 * Frame Buffer. Write directly to the Linux framebuffer. Allows graphical user interfaces without X being present.
 
