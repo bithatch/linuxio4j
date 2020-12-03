@@ -20,15 +20,35 @@ package uk.co.bithatch.linuxio;
 import com.sun.jna.Structure;
 import com.sun.jna.Structure.FieldOrder;
 
+/**
+ * The Class FbColorMap.
+ */
 @FieldOrder({"start", "len", "red", "green", "blue", "transp"})
 public class FbColorMap extends Structure {
+	
+	/** The start. */
 	public int start;
+	
+	/** The len. */
 	public int len;
+	
+	/** The red. */
 	public short[] red;
+	
+	/** The green. */
 	public short[] green;
+	
+	/** The blue. */
 	public short[] blue;
+	
+	/** The transp. */
 	public short[] transp;
 
+	/**
+	 * Instantiates a new fb color map.
+	 *
+	 * @param size the size
+	 */
 	public FbColorMap(int size) {
 		red = new short[size];
 		green = new short[size];

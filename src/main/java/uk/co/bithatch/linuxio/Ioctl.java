@@ -21,8 +21,12 @@ import java.util.Locale;
 
 import com.sun.jna.Native;
 
+/**
+ * The Class Ioctl.
+ */
 public class Ioctl {
 	
+	/** The instance. */
 	public static Ioctl INSTANCE = new Ioctl();
 	
 	int _IOC_NRBITS = 8;
@@ -33,6 +37,15 @@ public class Ioctl {
 	int _IOC_WRITE = 1;
 	int _IOC_READ = 2;
 
+	/**
+	 * Ioc.
+	 *
+	 * @param direction the direction
+	 * @param request_type the request type
+	 * @param request_nr the request nr
+	 * @param size the size
+	 * @return the int
+	 */
 	public int ioc(int direction, int request_type, int request_nr, int size) {
 		int _IOC_NRSHIFT = 0;
 		int _IOC_TYPESHIFT = _IOC_NRSHIFT + _IOC_NRBITS;
@@ -94,6 +107,11 @@ public class Ioctl {
 		}
 	}
 
+	/**
+	 * Machine ioctl.
+	 *
+	 * @return the ioctl
+	 */
 	public static Ioctl machineIoctl() {
 		String arch = normalizeArch(System.getProperty("os.arch"));
 		if ("ppc_32".equals(arch) || "ppc_64".equals(arch) || "ppcle_32".equals(arch) || "ppcle_64".equals(arch)) {
@@ -174,6 +192,12 @@ public class Ioctl {
 		return "unknown";
 	}
 
+	/**
+	 * Determine bitness.
+	 *
+	 * @param architecture the architecture
+	 * @return the int
+	 */
 	public static int determineBitness(String architecture) {
 		// try the widely adopted sun specification first.
 		String bitness = System.getProperty("sun.arch.data.model", "");
@@ -193,6 +217,12 @@ public class Ioctl {
 		return guessBitnessFromArchitecture(architecture);
 	}
 
+	/**
+	 * Guess bitness from architecture.
+	 *
+	 * @param arch the arch
+	 * @return the int
+	 */
 	public static int guessBitnessFromArchitecture(final String arch) {
 		if (arch.contains("64")) {
 			return 64;
@@ -201,6 +231,12 @@ public class Ioctl {
 		return 32;
 	}
 
+	/**
+	 * Ioc type size.
+	 *
+	 * @param size the size
+	 * @return the int
+	 */
 	public int _ioc_type_size(Object size) {
 		if (size instanceof Integer) {
 			return (Integer) size;
@@ -211,6 +247,12 @@ public class Ioctl {
 		}
 	}
 
+	/**
+	 * Ioc request type.
+	 *
+	 * @param requestType the request type
+	 * @return the int
+	 */
 	public int _ioc_request_type(Object requestType) {
 		if (requestType instanceof Byte) {
 			return ((Byte) requestType);
@@ -276,18 +318,16 @@ public class Ioctl {
 	}
 
 	/**
-	 * 
 	 * Python implementation of the `_IO(...)` macro from Linux.
 	 * 
 	 * This is a portable implementation of the `_IO(...)` macro from Linux. The
 	 * `_IO(...)` macro calculates a ioctl request number for ioctl request that do
 	 * not transfer any data.
-	 * 
+	 *
 	 * @param request_type The ioctl request type. This can be specified as either a
 	 *                     string ``'R'`` or an integer ``123``.
 	 * @param request_nr   The ioctl request number. This is an integer.
 	 * @return The calculated ioctl request number.
-	 * @return
 	 */
 	public int IO(Object request_type, int request_nr) {
 		Ioctl calc = machineIoctl();

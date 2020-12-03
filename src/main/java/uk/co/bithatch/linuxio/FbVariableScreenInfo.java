@@ -22,6 +22,9 @@ import java.util.Arrays;
 import com.sun.jna.Structure;
 import com.sun.jna.Structure.FieldOrder;
 
+/**
+ * The Class FbVariableScreenInfo.
+ */
 @FieldOrder({"xres", "yres", "xres_virtual", "yres_virtual",
 				"xoffset", "yoffset", "bits_per_pixel", "grayscale", "red",
 				"green", "blue", "transp", "nonstd", "activate", "height",
@@ -29,41 +32,93 @@ import com.sun.jna.Structure.FieldOrder;
 				"right_margin", "upper_margin", "lower_margin", "hsync_len",
 				"vsync_len", "sync", "vmode", "reserved"})
 public class FbVariableScreenInfo extends Structure {
+	
+	/** The xres. */
 	public int xres;
+	
+	/** The yres. */
 	public int yres;
+	
+	/** The xres virtual. */
 	public int xres_virtual;
+	
+	/** The yres virtual. */
 	public int yres_virtual;
+	
+	/** The xoffset. */
 	public int xoffset;
+	
+	/** The yoffset. */
 	public int yoffset;
 
+	/** The bits per pixel. */
 	public int bits_per_pixel;
+	
+	/** The grayscale. */
 	public int grayscale;
 
+	/** The red. */
 	public FbBitField red = new FbBitField();
+	
+	/** The green. */
 	public FbBitField green = new FbBitField();
+	
+	/** The blue. */
 	public FbBitField blue = new FbBitField();
+	
+	/** The transp. */
 	public FbBitField transp = new FbBitField();
 
+	/** The nonstd. */
 	public int nonstd;
 
+	/** The activate. */
 	public int activate;
 
+	/** The height. */
 	public int height;
+	
+	/** The width. */
 	public int width;
 
+	/** The accel flags. */
 	public int accel_flags;
 
+	/** The pixclock. */
 	public int pixclock;
+	
+	/** The left margin. */
 	public int left_margin;
+	
+	/** The right margin. */
 	public int right_margin;
+	
+	/** The upper margin. */
 	public int upper_margin;
+	
+	/** The lower margin. */
 	public int lower_margin;
+	
+	/** The hsync len. */
 	public int hsync_len;
+	
+	/** The vsync len. */
 	public int vsync_len;
+	
+	/** The sync. */
 	public int sync;
+	
+	/** The vmode. */
 	public int vmode;
+	
+	/** The reserved. */
 	public int[] reserved = new int[6];
 
+	/**
+	 * To string.
+	 *
+	 * @return the string
+	 */
 	@Override
 	public String toString() {
 		return "FbScreenInfo [xres=" + xres + ", yres=" + yres

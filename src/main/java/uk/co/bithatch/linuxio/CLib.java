@@ -33,16 +33,31 @@ import com.sun.jna.ptr.IntByReference;
  */
 public interface CLib extends com.sun.jna.Library {
 
+	/** The Constant JNA_LIBRARY_NAME. */
 	public static final String JNA_LIBRARY_NAME = (com.sun.jna.Platform.isWindows() ? "msvcrt" : "c");
+	
+	/** The Constant INSTANCE. */
 	public static final CLib INSTANCE = Native.load(CLib.JNA_LIBRARY_NAME, CLib.class);
 
+	/** The Constant PROT_WRITE. */
 	public static final int PROT_WRITE = (int) 0x2;
+	
+	/** The Constant PROT_READ. */
 	public static final int PROT_READ = (int) 0x1;
+	
+	/** The Constant MAP_SHARED. */
 	public static final int MAP_SHARED = (int) 0x01;
 
+	/** The Constant EVIOCGKEYCODE. */
 	public static final int EVIOCGKEYCODE = (int) (((2) << (((0 + 8) + 8) + 14)) | (('E') << (0 + 8)) | ((0x04) << 0));
+	
+	/** The Constant EVIOCGREP. */
 	public static final int EVIOCGREP = (int) (((2) << (((0 + 8) + 8) + 14)) | (('E') << (0 + 8)) | ((0x03) << 0));
+	
+	/** The Constant EVIOCSKEYCODE. */
 	public static final int EVIOCSKEYCODE = (int) (((1) << (((0 + 8) + 8) + 14)) | (('E') << (0 + 8)) | ((0x04) << 0));
+	
+	/** The Constant EVIOCSREP. */
 	public static final int EVIOCSREP = (int) (((1) << (((0 + 8) + 8) + 14)) | (('E') << (0 + 8)) | ((0x03) << 0));
 	/** <i>native declaration : bits/fcntl-linux.h</i> */
 	public static final int O_ACCMODE = (int) 003;
@@ -113,63 +128,233 @@ public interface CLib extends com.sun.jna.Library {
 	/** <i>native declaration : asm-generic/ioctl.h</i> */
 	public static final int _IOC_WRITE = (int) 1;
 
+	/** The Constant KDMKTONE. */
 	public static final int KDMKTONE = 0x4B30;
 
+	/** The pollin. */
 	public static short POLLIN = 0x0001;
+	
+	/** The pollpri. */
 	public static short POLLPRI = 0x0002;
 
+	/** The Constant IOC_OUT. */
 	public final static int IOC_OUT	= 0x40000000;	/* copy out parameters */
+	
+	/** The Constant IOC_IN. */
 	public final static int IOC_IN	= 0x80000000;	/* copy in parameters */
 	
+	/** The Constant IOC_NONE. */
 	public final static int IOC_NONE  = 0;
+	
+	/** The Constant IOC_WRITE. */
 	public final static int IOC_WRITE = 1;
+	
+	/** The Constant IOC_READ. */
 	public final static int IOC_READ  = 2;
 
+	/**
+	 * Ioctl.
+	 *
+	 * @param fd the fd
+	 * @param cmd the cmd
+	 * @return the int
+	 */
 	public int ioctl(int fd, int cmd);
 	
+	/**
+	 * Ioctl.
+	 *
+	 * @param fd the fd
+	 * @param cmd the cmd
+	 * @param val the val
+	 * @return the int
+	 */
 	public int ioctl(int fd, int cmd, Structure val);
 
+	/**
+	 * Ioctl.
+	 *
+	 * @param fd the fd
+	 * @param cmd the cmd
+	 * @param val the val
+	 * @return the int
+	 */
 	public int ioctl(int fd, int cmd, Pointer val);
 
+	/**
+	 * Ioctl.
+	 *
+	 * @param fd the fd
+	 * @param cmd the cmd
+	 * @param val the val
+	 * @return the int
+	 */
 	public int ioctl(int fd, int cmd, NativeLong[] val);
 
+	/**
+	 * Ioctl.
+	 *
+	 * @param fd the fd
+	 * @param cmd the cmd
+	 * @param val the val
+	 * @return the int
+	 */
 	public int ioctl(int fd, int cmd, int val);
 
+	/**
+	 * Ioctl.
+	 *
+	 * @param fd the fd
+	 * @param cmd the cmd
+	 * @param arg the arg
+	 * @return the int
+	 */
 	public int ioctl(int fd, int cmd, int[] arg);
 
+	/**
+	 * Ioctl.
+	 *
+	 * @param fd the fd
+	 * @param cmd the cmd
+	 * @param arg the arg
+	 * @return the int
+	 */
 	public int ioctl(int fd, int cmd, short[] arg);
 
+	/**
+	 * Ioctl.
+	 *
+	 * @param fd the fd
+	 * @param cmd the cmd
+	 * @param arg the arg
+	 * @return the int
+	 */
 	public int ioctl(int fd, int cmd, IntByReference arg);
 
+	/**
+	 * Ioctl.
+	 *
+	 * @param fd the fd
+	 * @param cmd the cmd
+	 * @param arg the arg
+	 * @return the int
+	 */
 	public int ioctl(int fd, int cmd, byte[] arg);
 
+	/**
+	 * Poll.
+	 *
+	 * @param fds the fds
+	 * @param nfds the nfds
+	 * @param timeout the timeout
+	 * @return the int
+	 */
 	public int poll(pollfd[] fds, int nfds, int timeout);
 
+	/**
+	 * Open.
+	 *
+	 * @param path the path
+	 * @param flags the flags
+	 * @return the int
+	 */
 	public int open(String path, int flags);
 
+	/**
+	 * Close.
+	 *
+	 * @param fd the fd
+	 * @return the int
+	 */
 	public int close(int fd);
 
+	/**
+	 * Read.
+	 *
+	 * @param fd the fd
+	 * @param pointer the pointer
+	 * @param nativeLong the native long
+	 * @return the native long
+	 */
 	public NativeLong read(int fd, Pointer pointer, NativeLong nativeLong);
 
+	/**
+	 * Write.
+	 *
+	 * @param fd the fd
+	 * @param pointer the pointer
+	 * @param nativeLong the native long
+	 * @return the native long
+	 */
 	public NativeLong write(int fd, Structure pointer, NativeLong nativeLong);
 
+	/**
+	 * Write.
+	 *
+	 * @param fd the fd
+	 * @param pointer the pointer
+	 * @param nativeLong the native long
+	 * @return the native long
+	 */
 	public NativeLong write(int fd, Pointer pointer, NativeLong nativeLong);
 
+	/**
+	 * Mmap.
+	 *
+	 * @param __addr the addr
+	 * @param __len the len
+	 * @param __prot the prot
+	 * @param __flags the flags
+	 * @param __fd the fd
+	 * @param __offset the offset
+	 * @return the pointer
+	 */
 	Pointer mmap(Pointer __addr, NativeLong __len, int __prot, int __flags, int __fd, NativeLong __offset);
 
+	/**
+	 * Munmap.
+	 *
+	 * @param __addr the addr
+	 * @param __len the len
+	 * @return the int
+	 */
 	int munmap(Pointer __addr, NativeLong __len);
 
+	/**
+	 * Ttyname.
+	 *
+	 * @param filedes the filedes
+	 * @return the string
+	 */
 	String ttyname(int filedes);
 
 	// int fb_register_client (struct notifier_block * nb);
 	// 179 extern int fb_unregister_client(struct notifier_block *nb);
+	/**
+	 * Fb register client.
+	 *
+	 * @return the int
+	 */
 	// 180 extern int fb_notifier_call_chain(unsigned long val, void *v);
 	int fb_register_client();
 
+	/**
+	 * Fb unregister client.
+	 *
+	 * @return the int
+	 */
 	int fb_unregister_client();
 
+	/**
+	 * Fb notifier call chain.
+	 *
+	 * @param val the val
+	 * @return the int
+	 */
 	int fb_notifier_call_chain(NativeLong val);
 
+	/**
+	 */
 	class pollfd extends Structure {
 		public int fd;
 		public short events;
@@ -181,6 +366,9 @@ public interface CLib extends com.sun.jna.Library {
 		}
 	}
 
+	/**
+	 *
+	 */
 	@FieldOrder({ "tv_sec", "tv_usec" })
 	class timeval extends Structure {
 		/**

@@ -24,6 +24,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Input event codes. https://www.kernel.org/doc/html/v4.17/input/event-codes.html 
+ */
 public enum EventCode
 {
 
@@ -884,26 +887,57 @@ public enum EventCode
 		}
 	}
 
+	/**
+	 * Type.
+	 *
+	 * @return the type
+	 */
 	public Type type() {
 		return type;
 	}
 
+	/**
+	 * Type code.
+	 *
+	 * @return the int
+	 */
 	public int typeCode() {
 		return type.code();
 	}
 
+	/**
+	 * Code.
+	 *
+	 * @return the short
+	 */
 	public short code() {
 		return code;
 	}
 
+	/**
+	 * Checks if is button.
+	 *
+	 * @return true, if is button
+	 */
 	public boolean isButton() {
 		return name().startsWith("BTN_");
 	}
 
+	/**
+	 * Checks if is key.
+	 *
+	 * @return true, if is key
+	 */
 	public boolean isKey() {
 		return name().startsWith("KEY_");
 	}
 	
+	/**
+	 * Parses the.
+	 *
+	 * @param string the string
+	 * @return the event code
+	 */
 	public static EventCode parse(String string) {
 		String[] parts =string.split(":");
 		if(parts.length == 1)
@@ -914,18 +948,44 @@ public enum EventCode
 			throw new IllegalArgumentException("Unexpected format. Either eventType:eventCode or eventName.");
 	}
 
+	/**
+	 * Checks if is button.
+	 *
+	 * @param code the code
+	 * @return true, if is button
+	 */
 	public static boolean isButton(int code) {
 		return Ev.buttons.containsKey(code);
 	}
 
+	/**
+	 * Checks if is key.
+	 *
+	 * @param code the code
+	 * @return true, if is key
+	 */
 	public static boolean isKey(int code) {
 		return Ev.keys.containsKey(code);
 	}
 	
+	/**
+	 * Checks for code.
+	 *
+	 * @param type the type
+	 * @param code the code
+	 * @return true, if successful
+	 */
 	public static boolean hasCode(int type, short code) {
 		return hasCode(Type.fromCode(type), code);
 	}
 
+	/**
+	 * Checks for code.
+	 *
+	 * @param type the type
+	 * @param code the code
+	 * @return true, if successful
+	 */
 	public static boolean hasCode(Type type, short code) {
 		Map<Integer, EventCode> mmap = Ev.codeToName.get(type);
 		if (mmap == null)
@@ -937,10 +997,24 @@ public enum EventCode
 		return true;
 	}
 
+	/**
+	 * From code.
+	 *
+	 * @param type the type
+	 * @param code the code
+	 * @return the event code
+	 */
 	public static EventCode fromCode(int type, int code) {
 		return fromCode(Type.fromCode(type), code);
 	}
 	
+	/**
+	 * From code.
+	 *
+	 * @param type the type
+	 * @param code the code
+	 * @return the event code
+	 */
 	public static EventCode fromCode(Type type, int code) {
 		Map<Integer, EventCode> mmap = Ev.codeToName.get(type);
 		if (mmap == null)
@@ -952,6 +1026,9 @@ public enum EventCode
 		return name;
 	}
 
+	/**
+	 * The Enum Type.
+	 */
 	public enum Type
 	{
 		EV_SYN(EventCode.Ev.EV_SYN),
@@ -975,6 +1052,12 @@ public enum EventCode
 			Ev.types.put(nativeType, this);
 		}
 
+		/**
+		 * Parses the.
+		 *
+		 * @param string the string
+		 * @return the type
+		 */
 		public static Type parse(String string) {
 			try {
 				return Type.fromCode(Integer.parseInt(string));
@@ -984,14 +1067,31 @@ public enum EventCode
 			}
 		}
 
+		/**
+		 * Code.
+		 *
+		 * @return the int
+		 */
 		public int code() {
 			return nativeType;
 		}
 
+		/**
+		 * From code.
+		 *
+		 * @param type the type
+		 * @return the type
+		 */
 		public static Type fromCode(int type) {
 			return Ev.types.getOrDefault(type, Type.UNKNOWN);
 		}
 
+		/**
+		 * Gets the.
+		 *
+		 * @param codes the codes
+		 * @return the collection
+		 */
 		public Collection<EventCode> get(Collection<EventCode> codes) {
 			List<EventCode> l = new ArrayList<>();
 			for (EventCode e : codes) {
@@ -1002,6 +1102,9 @@ public enum EventCode
 		}
 	}
 	
+	/**
+	 * The Enum Property.
+	 */
 	public enum Property
 	{
 		INPUT_PROP_POINTER(0x00),	/* needs a pointer */
@@ -1021,6 +1124,12 @@ public enum EventCode
 			Ev.properties.put(nativeType, this);
 		}
 
+		/**
+		 * Parses the.
+		 *
+		 * @param string the string
+		 * @return the property
+		 */
 		public static Property parse(String string) {
 			try {
 				return Property.fromCode(Integer.parseInt(string));
@@ -1035,10 +1144,21 @@ public enum EventCode
 			}
 		}
 
+		/**
+		 * Code.
+		 *
+		 * @return the int
+		 */
 		public int code() {
 			return nativeType;
 		}
 
+		/**
+		 * From code.
+		 *
+		 * @param type the type
+		 * @return the property
+		 */
 		public static Property fromCode(int type) {
 			Property p = Ev.properties.get(type);
 			if(p== null)
@@ -1046,6 +1166,12 @@ public enum EventCode
 			return p;
 		}
 
+		/**
+		 * Gets the.
+		 *
+		 * @param codes the codes
+		 * @return the collection
+		 */
 		public Collection<EventCode> get(Collection<EventCode> codes) {
 			List<EventCode> l = new ArrayList<>();
 			for (EventCode e : codes) {
@@ -1056,6 +1182,9 @@ public enum EventCode
 		}
 	}
 	
+	/**
+	 * The Enum AbsoluteValue.
+	 */
 	public enum AbsoluteValue {
 		VALUE,
 		MIN,
@@ -1066,23 +1195,53 @@ public enum EventCode
 		UNKNOWN
 	}
 
+	/**
+	 * The Class Ev.
+	 */
 	public static class Ev {
 
+		/** The Constant EV_VERSION. */
 		public static final int EV_VERSION = (int) 0x010001;
+		
+		/** The Constant EV_ABS. */
 		public static final int EV_ABS = (int) 0x03;
+		
+		/** The Constant EV_CNT. */
 		public static final int EV_CNT = (int) (0x1f + 1);
+		
+		/** The Constant EV_FF. */
 		public static final int EV_FF = (int) 0x15;
+		
+		/** The Constant EV_FF_STATUS. */
 		public static final int EV_FF_STATUS = (int) 0x17;
+		
+		/** The Constant EV_KEY. */
 		public static final int EV_KEY = (int) 0x01;
+		
+		/** The Constant EV_LED. */
 		public static final int EV_LED = (int) 0x11;
+		
+		/** The Constant EV_MAX. */
 		public static final int EV_MAX = (int) 0x1f;
+		
+		/** The Constant EV_MSC. */
 		public static final int EV_MSC = (int) 0x04;
+		
+		/** The Constant EV_PWR. */
 		public static final int EV_PWR = (int) 0x16;
+		
+		/** The Constant EV_REL. */
 		public static final int EV_REL = (int) 0x02;
 		/** <i>native declaration : bits/fcntl-linux.h</i> */
 		public static final int EV_REP = (int) 0x14;
+		
+		/** The Constant EV_SND. */
 		public static final int EV_SND = (int) 0x12;
+		
+		/** The Constant EV_SW. */
 		public static final int EV_SW = (int) 0x05;
+		
+		/** The Constant EV_SYN. */
 		public static final int EV_SYN = (int) 0x00;
 
 		final static Map<Type, Map<Integer, EventCode>> codeToName = new HashMap<>();

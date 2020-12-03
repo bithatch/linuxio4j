@@ -69,7 +69,7 @@ import uk.co.bithatch.linuxio.UInput.uinput_setup;
  * contains them.
  * <p>
  * You can also create virtual devices and emit events from them. For this use
- * the {@link InputDevice#UInputDevice(String, short, short)} constructor and
+ * the {@link InputDevice(String, short, short)} constructor and
  * the {@link #emit(Event)} methods.
  * 
  */
@@ -80,6 +80,9 @@ public class InputDevice implements Closeable {
 
 	final static Logger LOG = System.getLogger(InputDevice.class.getName());
 
+	/**
+	 * The Class Event.
+	 */
 	public static class Event {
 		private long utime;
 		private EventCode code;
@@ -89,14 +92,32 @@ public class InputDevice implements Closeable {
 			this(ev.time.tv_usec.longValue() * 1000, EventCode.fromCode(ev.type, ev.code), ev.value);
 		}
 
+		/**
+		 * Instantiates a new event.
+		 *
+		 * @param code the code
+		 */
 		public Event(EventCode code) {
 			this(code, 0);
 		}
 
+		/**
+		 * Instantiates a new event.
+		 *
+		 * @param code the code
+		 * @param value the value
+		 */
 		public Event(EventCode code, int value) {
 			this(0, code, value);
 		}
 
+		/**
+		 * Instantiates a new event.
+		 *
+		 * @param utime the utime
+		 * @param code the code
+		 * @param value the value
+		 */
 		public Event(long utime, EventCode code, int value) {
 			super();
 			this.utime = utime;
@@ -122,14 +143,29 @@ public class InputDevice implements Closeable {
 			return utime;
 		}
 
+		/**
+		 * Gets the code.
+		 *
+		 * @return the code
+		 */
 		public EventCode getCode() {
 			return code;
 		}
 
+		/**
+		 * Gets the value.
+		 *
+		 * @return the value
+		 */
 		public int getValue() {
 			return value;
 		}
 
+		/**
+		 * To string.
+		 *
+		 * @return the string
+		 */
 		@Override
 		public String toString() {
 			return "Event [time=" + utime + ", code=" + code + ", value=" + value + "]";
@@ -137,8 +173,10 @@ public class InputDevice implements Closeable {
 
 	}
 
+	/** The Constant SYN. */
 	public final static Event SYN = new Event(EventCode.SYN_REPORT, 0);
 
+	/** The Constant ABSVAL. */
 	public final static String[] ABSVAL = new String[] { "Value", "Min", "Max", "Fuzz", "Flat" };
 
 	private Path file;
@@ -168,8 +206,9 @@ public class InputDevice implements Closeable {
 	 * order, set the system property <b>linuxio.pointer.types</b> to a comma
 	 * separated string of the type codes (3 for absolute, 2 for relative), or use
 	 * the {@link Type} constant names EV_ABS and EV_REL.
-	 * 
+	 *
 	 * @return pointer device
+	 * @throws IOException Signals that an I/O exception has occurred.
 	 */
 	public final static InputDevice getFirstPointerDevice() throws IOException {
 		//
@@ -243,8 +282,9 @@ public class InputDevice implements Closeable {
 	 * order, set the system property <b>linuxio.pointer.types</b> to a comma
 	 * separated string of the type codes (3 for absolute, 2 for relative), or use
 	 * the {@link Type} constant names EV_ABS and EV_REL.
-	 * 
+	 *
 	 * @return pointer devices
+	 * @throws IOException Signals that an I/O exception has occurred.
 	 */
 	public final static List<InputDevice> getAllPointerDevices() throws IOException {
 		List<InputDevice> pointerDevices = new ArrayList<InputDevice>();
@@ -301,8 +341,9 @@ public class InputDevice implements Closeable {
 
 	/**
 	 * Helper to get what appears to be all keyboard device names.
-	 * 
+	 *
 	 * @return keyboard device names
+	 * @throws IOException Signals that an I/O exception has occurred.
 	 */
 	public final static List<String> getAllKeyboardDeviceNames() throws IOException {
 		List<String> keyboardDeviceNames = new ArrayList<String>();
@@ -341,8 +382,9 @@ public class InputDevice implements Closeable {
 	 * found, an exception will be thrown. NOTE, all {@link InputDevice} returned
 	 * will be <b>open</b>, so should be closed if you do not intend to carry on
 	 * using them.
-	 * 
+	 *
 	 * @return keyboard devices
+	 * @throws IOException Signals that an I/O exception has occurred.
 	 */
 	public final static List<InputDevice> getAllKeyboardDevices() throws IOException {
 		List<InputDevice> keyboardDevices = new ArrayList<InputDevice>();
@@ -373,9 +415,10 @@ public class InputDevice implements Closeable {
 
 	/**
 	 * Helper to get an open device given its name.
-	 * 
-	 * @param name
+	 *
+	 * @param name the name
 	 * @return device
+	 * @throws IOException Signals that an I/O exception has occurred.
 	 */
 	public final static InputDevice getDeviceByName(String name) throws IOException {
 
@@ -394,8 +437,9 @@ public class InputDevice implements Closeable {
 	/**
 	 * Helper to get what appears to be the first keyboard device. If no devices
 	 * could be found, an exception will be thrown.
-	 * 
+	 *
 	 * @return keyboard device
+	 * @throws IOException Signals that an I/O exception has occurred.
 	 */
 	public final static InputDevice getFirstKeyboardDevice() throws IOException {
 
@@ -438,9 +482,10 @@ public class InputDevice implements Closeable {
 	}
 
 	/**
-	 * Get a list of all available devices;
-	 * 
-	 * @return
+	 * Get a list of all available devices;.
+	 *
+	 * @return the available devices
+	 * @throws IOException Signals that an I/O exception has occurred.
 	 */
 	public final static List<InputDevice> getAvailableDevices() throws IOException {
 		final List<InputDevice> d = new ArrayList<InputDevice>();
@@ -506,8 +551,8 @@ public class InputDevice implements Closeable {
 	}
 
 	/**
-	 * Open an existing device given it's file for reading events
-	 * 
+	 * Open an existing device given it's file for reading events.
+	 *
 	 * @param file device file
 	 * @throws IOException if device file cannot be opened.
 	 */
@@ -516,8 +561,8 @@ public class InputDevice implements Closeable {
 	}
 
 	/**
-	 * Open an existing device given it's file for reading events
-	 * 
+	 * Open an existing device given it's file for reading events.
+	 *
 	 * @param file device file
 	 * @throws IOException if device file cannot be opened.
 	 */
@@ -564,6 +609,11 @@ public class InputDevice implements Closeable {
 		this.name = name;
 	}
 
+	/**
+	 * Open.
+	 *
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public void open() throws IOException {
 		if (read) {
 			openForRead(file);
@@ -705,8 +755,8 @@ public class InputDevice implements Closeable {
 	}
 
 	/**
-	 * Get the driver version
-	 * 
+	 * Get the driver version.
+	 *
 	 * @return driver version
 	 */
 	public String getDriverVersion() {
@@ -714,8 +764,8 @@ public class InputDevice implements Closeable {
 	}
 
 	/**
-	 * Get the name for this device
-	 * 
+	 * Get the name for this device.
+	 *
 	 * @return device name
 	 */
 	public String getName() {
@@ -725,6 +775,8 @@ public class InputDevice implements Closeable {
 	/**
 	 * Add a capability to an event type. Only relevant when creating a new virtual
 	 * device, and must be done before the call is made to {@link #open()}.
+	 *
+	 * @param codes the codes
 	 */
 	public void addCapability(EventCode... codes) {
 		caps.addAll(Arrays.asList(codes));
@@ -787,7 +839,8 @@ public class InputDevice implements Closeable {
 	/**
 	 * Get the capabilities the device has (or should have) for a particular event
 	 * type. This set may not be notified.
-	 * 
+	 *
+	 * @param type the type
 	 * @return capabilities
 	 */
 	public Set<EventCode> getCapabilities(EventCode.Type type) {
@@ -801,8 +854,8 @@ public class InputDevice implements Closeable {
 
 	/**
 	 * Get the path to file this input device is accessed by.
-	 * 
-	 * @return
+	 *
+	 * @return the file
 	 */
 	public Path getFile() {
 		return file;
@@ -1061,8 +1114,9 @@ public class InputDevice implements Closeable {
 	/**
 	 * Read the next event, blocking if there are none. <code>null</code> will be
 	 * returned the device closes.
-	 * 
+	 *
 	 * @return next input event or <code>null</code>
+	 * @throws IOException Signals that an I/O exception has occurred.
 	 */
 	public Event nextEvent() throws IOException {
 		if (!read) {
@@ -1086,6 +1140,11 @@ public class InputDevice implements Closeable {
 		return new Event(ev);
 	}
 
+	/**
+	 * Close.
+	 *
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	@Override
 	public void close() throws IOException {
 		if (!open) {
@@ -1111,6 +1170,11 @@ public class InputDevice implements Closeable {
 
 	// Macros
 
+	/**
+	 * To string.
+	 *
+	 * @return the string
+	 */
 	@Override
 	public String toString() {
 		return "InputDevice [file=" + file + ", fd=" + fd + ", grabbed=" + grabbed + ", name=" + name
@@ -1139,6 +1203,12 @@ public class InputDevice implements Closeable {
 		return ((((x) - 1) / BITS_PER_LONG()) + 1);
 	}
 
+	/**
+	 * The main method.
+	 *
+	 * @param args the arguments
+	 * @throws Exception the exception
+	 */
 	public final static void main(String[] args) throws Exception {
 		// for (InputDevice d : getAvailableDevices()) {
 		// LOG.info(d);
@@ -1147,46 +1217,101 @@ public class InputDevice implements Closeable {
 		LOG.log(Level.INFO, "Keyboard: " + InputDevice.getFirstKeyboardDevice());
 	}
 
+	/**
+	 * Checks if is open.
+	 *
+	 * @return true, if is open
+	 */
 	public boolean isOpen() {
 		return open;
 	}
 
+	/**
+	 * Gets the fd.
+	 *
+	 * @return the fd
+	 */
 	public int getFD() {
 		return fd;
 	}
 
+	/**
+	 * Gets the version.
+	 *
+	 * @return the version
+	 */
 	public int getVersion() {
 		return version;
 	}
 
+	/**
+	 * Gets the bus.
+	 *
+	 * @return the bus
+	 */
 	public int getBus() {
 		return bus;
 	}
 
+	/**
+	 * Gets the vendor.
+	 *
+	 * @return the vendor
+	 */
 	public int getVendor() {
 		return vendor;
 	}
 
+	/**
+	 * Gets the product.
+	 *
+	 * @return the product
+	 */
 	public int getProduct() {
 		return product;
 	}
 
+	/**
+	 * Sets the vendor.
+	 *
+	 * @param vendor the new vendor
+	 */
 	public void setVendor(int vendor) {
 		this.vendor = vendor;
 	}
 
+	/**
+	 * Sets the product.
+	 *
+	 * @param product the new product
+	 */
 	public void setProduct(int product) {
 		this.product = product;
 	}
 
+	/**
+	 * Sets the bus.
+	 *
+	 * @param bus the new bus
+	 */
 	public void setBus(int bus) {
 		this.bus = bus;
 	}
 
+	/**
+	 * Sets the version.
+	 *
+	 * @param version the new version
+	 */
 	public void setVersion(int version) {
 		this.version = version;
 	}
 
+	/**
+	 * Gets the supported types.
+	 *
+	 * @return the supported types
+	 */
 	public Set<EventCode.Type> getSupportedTypes() {
 		Set<EventCode.Type> l = new LinkedHashSet<>();
 		for (EventCode code : getCapabilities()) {

@@ -50,7 +50,17 @@ public class InputController {
 
 	final static Logger LOG = System.getLogger(InputController.class.getName());
 
+	/**
+	 * The Interface Callback.
+	 */
 	public interface Callback {
+		
+		/**
+		 * Event.
+		 *
+		 * @param device the device
+		 * @param event the event
+		 */
 		void event(InputDevice device, Event event);
 	}
 
@@ -204,6 +214,9 @@ public class InputController {
 		}
 	}
 
+	/**
+	 * Stop.
+	 */
 	public void stop() {
 		for (InputDevice d : new ArrayList<InputDevice>(devices.keySet())) {
 			remove(d);

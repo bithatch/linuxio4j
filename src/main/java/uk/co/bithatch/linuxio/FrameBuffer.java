@@ -98,6 +98,7 @@ public class FrameBuffer implements Closeable {
 
 	private final static CLib C_LIBRARY = CLib.INSTANCE;
 
+	/** The Constant DEVICES_DIR. */
 	public final static File DEVICES_DIR = new File(System.getProperty("linuxio.frameBufferDeviceDirectory", "/dev"));
 
 	private Buffer buffer;
@@ -118,8 +119,8 @@ public class FrameBuffer implements Closeable {
 	}
 
 	/**
-	 * Get a single framebuffer given its device filename
-	 * 
+	 * Get a single framebuffer given its device filename.
+	 *
 	 * @param deviceFileName device file name (e.g. /dev/fb0)
 	 * @return opened framebuffer
 	 * @throws IOException on any error opening the framebuffer
@@ -233,8 +234,8 @@ public class FrameBuffer implements Closeable {
 
 	/**
 	 * Set whether the console cursor is visible.
-	 * 
-	 * @param visible
+	 *
+	 * @param visible the new console cursor visible
 	 */
 	public static void setConsoleCursorVisible(boolean visible) {
 		File f = new File("/sys/class/graphics/fbcon/cursor_blink");
@@ -254,9 +255,9 @@ public class FrameBuffer implements Closeable {
 	
 	/**
 	 * Get the {@link ByteBuffer} that backs this frame buffer. 
-	 * 
+	 *
 	 * @return buffer
-	 * @throws IOException 
+	 * @throws IOException Signals that an I/O exception has occurred.
 	 */
 	public ByteBuffer getBuffer() throws IOException {
 		if(nativeBuffer == null) {
@@ -332,10 +333,10 @@ public class FrameBuffer implements Closeable {
 	}
 
 	/**
-	 * Write an image to the backing image 
-	 * 
+	 * Write an image to the backing image .
+	 *
 	 * @param image image to draw onto the backing image
-	 * @throws IOException
+	 * @throws IOException Signals that an I/O exception has occurred.
 	 */
 	public void write(BufferedImage image) throws IOException {
 		synchronized (lock) {
@@ -350,9 +351,9 @@ public class FrameBuffer implements Closeable {
 	/**
 	 * Commit a specific area of the backing image to the frame buffer. See
 	 * {@link FrameBuffer#commit()} for more information.
-	 * 
+	 *
 	 * @param area area of backing image to commit to the framebuffer
-	 * @throws IOException
+	 * @throws IOException Signals that an I/O exception has occurred.
 	 */
 	public void commit(Rectangle area) throws IOException {
 		synchronized (lock) {
@@ -408,8 +409,8 @@ public class FrameBuffer implements Closeable {
 	 * call has been made to {@link #getGraphics}, which is then used to draw
 	 * several primitives, and finally sending the changed backing image to the
 	 * framebuffer with a {@link #commit()}.
-	 * 
-	 * @throws IOException
+	 *
+	 * @throws IOException Signals that an I/O exception has occurred.
 	 */
 	public void commit() throws IOException {
 		synchronized (lock) {
@@ -444,11 +445,11 @@ public class FrameBuffer implements Closeable {
 
 	/**
 	 * Create a image compatible with the image backing this framebuffer.
-	 * 
+	 *
 	 * @param w width of image
 	 * @param h height of image
 	 * @return image
-	 * @throws IOException
+	 * @throws IOException Signals that an I/O exception has occurred.
 	 */
 	public BufferedImage createCompatibleImage(int w, int h) throws IOException {
 		synchronized (lock) {
@@ -625,6 +626,11 @@ public class FrameBuffer implements Closeable {
 		return String.format("%" + s + "s", Integer.toBinaryString(i)).replace(' ', '0');
 	}
 
+	/**
+	 * To string.
+	 *
+	 * @return the string
+	 */
 	@Override
 	public String toString() {
 		FbVariableScreenInfo variableScreenInfo = null;
@@ -636,10 +642,20 @@ public class FrameBuffer implements Closeable {
 				+ ", fixedScreenInfo=" + fixedScreenInfo + "]";
 	}
 
+	/**
+	 * Gets the fixed screen info.
+	 *
+	 * @return the fixed screen info
+	 */
 	public FbFixedScreenInfo getFixedScreenInfo() {
 		return fixedScreenInfo;
 	}
 
+	/**
+	 * Gets the image.
+	 *
+	 * @return the image
+	 */
 	public BufferedImage getImage() {
 		synchronized (lock) {
 			checkBufferImage();
@@ -647,11 +663,27 @@ public class FrameBuffer implements Closeable {
 		}
 	}
 
+	/**
+	 * Close.
+	 *
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	@Override
 	public void close() throws IOException {
 		C_LIBRARY.close(fh);
 	}
 
+	/**
+	 * Copy image data.
+	 *
+	 * @param subimage the subimage
+	 * @param sx the sx
+	 * @param sy the sy
+	 * @param x the x
+	 * @param y the y
+	 * @param w the w
+	 * @param h the h
+	 */
 	public void copyImageData(BufferedImage subimage, int sx, int sy, int x, int y, int w, int h) {
 		int offset = (y * buffer.image.getWidth()) + x;
 		int soffset = (sy * subimage.getWidth()) + sx;

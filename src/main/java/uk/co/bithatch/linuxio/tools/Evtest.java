@@ -29,8 +29,17 @@ import uk.co.bithatch.linuxio.EventCode;
 import uk.co.bithatch.linuxio.InputDevice;
 import uk.co.bithatch.linuxio.InputDevice.Event;
 
+/**
+ * The Class Evtest.
+ */
 public class Evtest {
 
+	/**
+	 * The main method.
+	 *
+	 * @param args the arguments
+	 * @throws Exception the exception
+	 */
 	public final static void main(String[] args) throws Exception {
 		List<String> argList = new ArrayList<>(Arrays.asList(args));
 		boolean grab = false;

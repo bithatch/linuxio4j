@@ -37,8 +37,17 @@ import uk.co.bithatch.linuxio.EventCode;
 import uk.co.bithatch.linuxio.InputDevice;
 import uk.co.bithatch.linuxio.InputDevice.Event;
 
+/**
+ * The Class LinuxIO.
+ */
 public class LinuxIO {
 
+	/**
+	 * Main 1.
+	 *
+	 * @param reader the reader
+	 * @throws Exception the exception
+	 */
 	public static void main1(BufferedReader reader) throws Exception {
 		FrameBuffer buf = FrameBuffer.getFrameBuffers().get(0);
 		try {
@@ -55,6 +64,12 @@ public class LinuxIO {
 		}
 	}
 
+	/**
+	 * Main 2.
+	 *
+	 * @param reader the reader
+	 * @throws Exception the exception
+	 */
 	public static void main2(BufferedReader reader) throws Exception {
 		FrameBuffer fb = FrameBuffer.getFrameBuffers().get(0);
 		try {
@@ -76,6 +91,12 @@ public class LinuxIO {
 		}
 	}
 
+	/**
+	 * Main 3.
+	 *
+	 * @param reader the reader
+	 * @throws Exception the exception
+	 */
 	public static void main3(BufferedReader reader) throws Exception {
 		for (int i = 0; i < 80; i++) {
 			System.out.println();
@@ -100,6 +121,12 @@ public class LinuxIO {
 		}
 	}
 
+	/**
+	 * Main 4.
+	 *
+	 * @param reader the reader
+	 * @throws Exception the exception
+	 */
 	public static void main4(BufferedReader reader) throws Exception {
 		for (int i = 0; i < 80; i++) {
 			System.out.println();
@@ -121,6 +148,12 @@ public class LinuxIO {
 		}
 	}
 
+	/**
+	 * Main 5.
+	 *
+	 * @param reader the reader
+	 * @throws Exception the exception
+	 */
 	public static void main5(BufferedReader reader) throws Exception {
 		InputDevice dev = InputDevice.getFirstKeyboardDevice();
 		System.out.println(dev);
@@ -171,6 +204,12 @@ public class LinuxIO {
 		}
 	}
 
+	/**
+	 * Main 6.
+	 *
+	 * @param reader the reader
+	 * @throws Exception the exception
+	 */
 	public static void main6(BufferedReader reader) throws Exception {
 		InputDevice firstPointerDevice = InputDevice.getFirstPointerDevice();
 		System.out.println(firstPointerDevice);
@@ -220,12 +259,24 @@ public class LinuxIO {
 		}
 	}
 
+	/**
+	 * Main 7.
+	 *
+	 * @param reader the reader
+	 * @throws Exception the exception
+	 */
 	public static void main7(BufferedReader reader) throws Exception {
 		for (InputDevice d : InputDevice.getAvailableDevices()) {
 			System.out.println(d);
 		}
 	}
 
+	/**
+	 * Main 8.
+	 *
+	 * @param reader the reader
+	 * @throws Exception the exception
+	 */
 	public static void main8(BufferedReader reader) throws Exception {
 		try (InputDevice dev = new InputDevice("LinuxIO Test", (short) 0x1234, (short) 0x5678)) {
 			dev.addCapability(EventCode.KEY_E, EventCode.KEY_X, EventCode.KEY_I,
@@ -275,6 +326,14 @@ public class LinuxIO {
 		}
 	}
 
+	/**
+	 * Menu.
+	 *
+	 * @param reader the reader
+	 * @param opts the opts
+	 * @return the int
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public static int menu(BufferedReader reader, String... opts) throws IOException {
 		int x = 1;
 		for (String o : opts) {
@@ -293,6 +352,12 @@ public class LinuxIO {
 		}
 	}
 
+	/**
+	 * The main method.
+	 *
+	 * @param args the arguments
+	 * @throws Exception the exception
+	 */
 	public static void main(String[] args) throws Exception {
 		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 		while (true) {
