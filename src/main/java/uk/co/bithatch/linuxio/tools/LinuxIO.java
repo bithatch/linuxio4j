@@ -26,8 +26,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Random;
 
@@ -35,10 +33,9 @@ import javax.imageio.ImageIO;
 
 import uk.co.bithatch.linuxio.FbVariableScreenInfo;
 import uk.co.bithatch.linuxio.FrameBuffer;
-import uk.co.bithatch.linuxio.InputEventCodes;
-import uk.co.bithatch.linuxio.UInputDevice;
-import uk.co.bithatch.linuxio.UInputDevice.Event;
-import uk.co.bithatch.linuxio.UInputDevice.Type;
+import uk.co.bithatch.linuxio.EventCode;
+import uk.co.bithatch.linuxio.InputDevice;
+import uk.co.bithatch.linuxio.InputDevice.Event;
 
 public class LinuxIO {
 
@@ -125,7 +122,7 @@ public class LinuxIO {
 	}
 
 	public static void main5(BufferedReader reader) throws Exception {
-		UInputDevice dev = UInputDevice.getFirstKeyboardDevice();
+		InputDevice dev = InputDevice.getFirstKeyboardDevice();
 		System.out.println(dev);
 		boolean grab = false;
 		while (true) {
@@ -140,7 +137,7 @@ public class LinuxIO {
 				try {
 					while (true) {
 						Event ev = dev.nextEvent();
-						if (ev == null || ev.getCode() == InputEventCodes.KEY_ESC) {
+						if (ev == null || ev.getCode() == EventCode.KEY_ESC) {
 							break;
 						}
 						System.out.println(ev);
@@ -156,8 +153,8 @@ public class LinuxIO {
 				break;
 			case 3:
 				List<String> devNames = new ArrayList<String>();
-				List<UInputDevice> devs = new ArrayList<UInputDevice>();
-				for (UInputDevice d : UInputDevice.getAllKeyboardDevices()) {
+				List<InputDevice> devs = new ArrayList<InputDevice>();
+				for (InputDevice d : InputDevice.getAllKeyboardDevices()) {
 					devNames.add(d.getName());
 					devs.add(d);
 				}
@@ -175,7 +172,7 @@ public class LinuxIO {
 	}
 
 	public static void main6(BufferedReader reader) throws Exception {
-		UInputDevice firstPointerDevice = UInputDevice.getFirstPointerDevice();
+		InputDevice firstPointerDevice = InputDevice.getFirstPointerDevice();
 		System.out.println(firstPointerDevice);
 		boolean grab = false;
 		while (true) {
@@ -205,8 +202,8 @@ public class LinuxIO {
 				break;
 			case 3:
 				List<String> devNames = new ArrayList<String>();
-				List<UInputDevice> devs = new ArrayList<UInputDevice>();
-				for (UInputDevice d : UInputDevice.getAllPointerDevices()) {
+				List<InputDevice> devs = new ArrayList<InputDevice>();
+				for (InputDevice d : InputDevice.getAllPointerDevices()) {
 					devNames.add(d.getName());
 					devs.add(d);
 				}
@@ -224,15 +221,15 @@ public class LinuxIO {
 	}
 
 	public static void main7(BufferedReader reader) throws Exception {
-		for (UInputDevice d : UInputDevice.getAvailableDevices()) {
+		for (InputDevice d : InputDevice.getAvailableDevices()) {
 			System.out.println(d);
 		}
 	}
 
 	public static void main8(BufferedReader reader) throws Exception {
-		try (UInputDevice dev = new UInputDevice("LinuxIO Test", (short) 0x1234, (short) 0x5678)) {
-			dev.getCapabilities().put(Type.EV_KEY, new LinkedHashSet<>(Arrays.asList(InputEventCodes.KEY_E,
-					InputEventCodes.KEY_X, InputEventCodes.KEY_I, InputEventCodes.KEY_T, InputEventCodes.KEY_ENTER)));
+		try (InputDevice dev = new InputDevice("LinuxIO Test", (short) 0x1234, (short) 0x5678)) {
+			dev.addCapability(EventCode.KEY_E, EventCode.KEY_X, EventCode.KEY_I,
+					EventCode.KEY_T, EventCode.KEY_ENTER);
 			dev.open();
 			System.out.println("Type in 'exit' or I will do it for you in 10 seconds!");
 			String line;
@@ -240,26 +237,26 @@ public class LinuxIO {
 				public void run() {
 					try {
 						Thread.sleep(10000);
-						dev.emit(new UInputDevice.Event(UInputDevice.Type.EV_KEY, InputEventCodes.KEY_E, 1));
+						dev.emit(new InputDevice.Event(EventCode.KEY_E, 1));
 						Thread.sleep(100);
-						dev.emit(new UInputDevice.Event(UInputDevice.Type.EV_KEY, InputEventCodes.KEY_E, 0));
+						dev.emit(new InputDevice.Event(EventCode.KEY_E, 0));
 						Thread.sleep(100);
-						dev.emit(new UInputDevice.Event(UInputDevice.Type.EV_KEY, InputEventCodes.KEY_X, 1));
+						dev.emit(new InputDevice.Event(EventCode.KEY_X, 1));
 						Thread.sleep(100);
-						dev.emit(new UInputDevice.Event(UInputDevice.Type.EV_KEY, InputEventCodes.KEY_X, 0));
+						dev.emit(new InputDevice.Event(EventCode.KEY_X, 0));
 						Thread.sleep(100);
-						dev.emit(new UInputDevice.Event(UInputDevice.Type.EV_KEY, InputEventCodes.KEY_I, 1));
+						dev.emit(new InputDevice.Event(EventCode.KEY_I, 1));
 						Thread.sleep(100);
-						dev.emit(new UInputDevice.Event(UInputDevice.Type.EV_KEY, InputEventCodes.KEY_I, 0));
+						dev.emit(new InputDevice.Event(EventCode.KEY_I, 0));
 						Thread.sleep(100);
-						dev.emit(new UInputDevice.Event(UInputDevice.Type.EV_KEY, InputEventCodes.KEY_T, 1));
+						dev.emit(new InputDevice.Event(EventCode.KEY_T, 1));
 						Thread.sleep(100);
-						dev.emit(new UInputDevice.Event(UInputDevice.Type.EV_KEY, InputEventCodes.KEY_T, 0));
+						dev.emit(new InputDevice.Event(EventCode.KEY_T, 0));
 						Thread.sleep(100);
 						;
-						dev.emit(new UInputDevice.Event(UInputDevice.Type.EV_KEY, InputEventCodes.KEY_ENTER, 1));
+						dev.emit(new InputDevice.Event(EventCode.KEY_ENTER, 1));
 						Thread.sleep(100);
-						dev.emit(new UInputDevice.Event(UInputDevice.Type.EV_KEY, InputEventCodes.KEY_ENTER, 0));
+						dev.emit(new InputDevice.Event(EventCode.KEY_ENTER, 0));
 					} catch (Exception e) {
 					}
 				}

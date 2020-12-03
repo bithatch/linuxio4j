@@ -267,11 +267,11 @@ public class Input {
 		}
 		
 		public static int EVIOCGABS(int abs) {
-			return Ioctl.INSTANCE.IOR("E", 0x40 + abs, input_absinfo.class);  /* get abs value/limits */
+			return Ioctl.INSTANCE.IOR("E", 0x40 + abs, new input_absinfo());  /* get abs value/limits */
 		}
 		
 		public static int EVIOCSABS(int abs) {
-			return Ioctl.INSTANCE.IOR("E", 0x40 + abs, input_absinfo.class);  /* set abs value/limits */
+			return Ioctl.INSTANCE.IOW("E", 0xc0 + abs, new input_absinfo());  /* set abs value/limits */
 		}
 	}
 }

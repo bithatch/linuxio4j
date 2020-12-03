@@ -27,46 +27,46 @@ import java.util.Map;
 import java.util.concurrent.Semaphore;
 
 import uk.co.bithatch.linuxio.CLib.pollfd;
-import uk.co.bithatch.linuxio.UInputDevice.Event;
+import uk.co.bithatch.linuxio.InputDevice.Event;
 
 /**
  * Manages keyboard and mouse input devices. This is the recommended way to
- * captures events from {@link UInputDevice} instances. There is one
- * {@link UInputController} per runtime, the instance of which is obtained using
- * {@link #getInstance()}. Then {@link UInputDevice} instances are then
- * registered using {@link #add(UInputDevice, Callback)}. The callback argument
- * will have it's {@link Callback#event(UInputDevice, Event)} method invoked
+ * captures events from {@link InputDevice} instances. There is one
+ * {@link InputController} per runtime, the instance of which is obtained using
+ * {@link #getInstance()}. Then {@link InputDevice} instances are then
+ * registered using {@link #add(InputDevice, Callback)}. The callback argument
+ * will have it's {@link Callback#event(InputDevice, Event)} method invoked
  * whenever events from that device are received.
  * <p>
- * When {@link #add(UInputDevice, Callback)} is used for the first time, a
+ * When {@link #add(InputDevice, Callback)} is used for the first time, a
  * thread is started to handle the polling. The same thread is then used for
  * subsequent devices.
  * <p>
- * Devices may be de-registered using {@link #remove(UInputDevice)}. When the
+ * Devices may be de-registered using {@link #remove(InputDevice)}. When the
  * last device is removed, the polling thread is also shutdown.
  *
  */
-public class UInputController {
+public class InputController {
 
-	final static Logger LOG = System.getLogger(UInputController.class.getName());
+	final static Logger LOG = System.getLogger(InputController.class.getName());
 
 	public interface Callback {
-		void event(UInputDevice device, Event event);
+		void event(InputDevice device, Event event);
 	}
 
-	private Map<UInputDevice, Callback> devices = new HashMap<UInputDevice, UInputController.Callback>();
-	private Map<Integer, UInputDevice> devicesByFd = new HashMap<Integer, UInputDevice>();
+	private Map<InputDevice, Callback> devices = new HashMap<InputDevice, InputController.Callback>();
+	private Map<Integer, InputDevice> devicesByFd = new HashMap<Integer, InputDevice>();
 	private pollfd[] pollFds;
 	private Semaphore semaphore = new Semaphore(1);
 
-	private final static UInputController INSTANCE = new UInputController();
+	private final static InputController INSTANCE = new InputController();
 
 	/**
 	 * Get the static instance of the controller.
 	 * 
 	 * @return controller instance
 	 */
-	public final static UInputController getInstance() {
+	public final static InputController getInstance() {
 		return INSTANCE;
 	}
 
@@ -77,7 +77,7 @@ public class UInputController {
 	 * 
 	 * @param device device to remove.
 	 */
-	public void remove(UInputDevice device) {
+	public void remove(InputDevice device) {
 		try {
 			synchronized (devices) {
 				if (!devices.containsKey(device)) {
@@ -115,7 +115,7 @@ public class UInputController {
 
 	/**
 	 * Add a new device to be monitored for events, calling the
-	 * {@link Callback#event(UInputDevice, Event)} method of the provided callback.
+	 * {@link Callback#event(InputDevice, Event)} method of the provided callback.
 	 * <p>
 	 * If this is the first device to be added, the polling thread will also be
 	 * started.
@@ -123,7 +123,7 @@ public class UInputController {
 	 * @param device   device to monitor
 	 * @param callback callback invoked when event arrives for this device
 	 */
-	public void add(UInputDevice device, Callback callback) {
+	public void add(InputDevice device, Callback callback) {
 		synchronized (devices) {
 			devices.put(device, callback);
 			devicesByFd.put(device.getFD(), device);
@@ -140,7 +140,7 @@ public class UInputController {
 					}
 				};
 				t.setPriority(Thread.MAX_PRIORITY);
-				t.setDaemon(true);
+//				t.setDaemon(true);
 				t.start();
 			}
 			if (LOG.isLoggable(Level.DEBUG))
@@ -155,7 +155,7 @@ public class UInputController {
 					synchronized (devices) {
 						pollFds = (CLib.pollfd[]) new CLib.pollfd().toArray(devices.size());
 						int i = 0;
-						for (UInputDevice dev : devices.keySet()) {
+						for (InputDevice dev : devices.keySet()) {
 							// pollfd pfd = new CLib.pollfd();
 							pollfd pfd = pollFds[i];
 							pfd.fd = dev.getFD();
@@ -180,7 +180,7 @@ public class UInputController {
 					// Success, have data, get the events
 					for (pollfd pfd : pollFds) {
 						if (pfd.revents != 0) {
-							UInputDevice dev = devicesByFd.get(pfd.fd);
+							InputDevice dev = devicesByFd.get(pfd.fd);
 							if (dev == null) {
 								LOG.log(Level.WARNING, "Could not find device for FD " + pfd.fd);
 							} else {
@@ -205,7 +205,7 @@ public class UInputController {
 	}
 
 	public void stop() {
-		for (UInputDevice d : new ArrayList<UInputDevice>(devices.keySet())) {
+		for (InputDevice d : new ArrayList<InputDevice>(devices.keySet())) {
 			remove(d);
 		}
 	}

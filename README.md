@@ -108,7 +108,8 @@ To get a `Graphics` to draw on :-
 To grab and read mouse events :-
 
 ```java
-   try(UInputDevice mouse = UInputDevice.getFirstPointerDevice()) {
+   try(InputDevice mouse = InputDevice.getFirstPointerDevice()) {
+		 mouse.open();
         mouse.grab();
         while (true) {
 			Event ev = mouse.nextEvent();
@@ -118,37 +119,42 @@ To grab and read mouse events :-
 			System.out.println(ev);
 		}
 	}
-   }
 ```
 
 To create a new virtual keyboard device and emit some keys :-
 
 ```java
-try (UInputDevice dev = new UInputDevice("LinuxIO Test", (short) 0x1234, (short) 0x5678)) {
+try (InputDevice dev = new InputDevice("LinuxIO Test", (short) 0x1234, (short) 0x5678)) {
 
 	dev.getCapabilities().put(
 		Type.EV_KEY, new LinkedHashSet<>(Arrays.asList(
-			InputEventCodes.KEY_H,
-			InputEventCodes.KEY_E, 
-			InputEventCodes.KEY_L, 
-			InputEventCodes.KEY_O, 
-			InputEventCodes.KEY_W, 
-			InputEventCodes.KEY_R, 
-			InputEventCodes.KEY_D, 
-			InputEventCodes.KEY_ENTER)));
+			EventCode.KEY_H,
+			EventCode.KEY_E, 
+			EventCode.KEY_L, 
+			EventCode.KEY_O, 
+			EventCode.KEY_W, 
+			EventCode.KEY_R, 
+			EventCode.KEY_D, 
+			EventCode.KEY_ENTER)));
 	dev.open();
-	dev.typeKey(InputEventCodes.KEY_H);
-	dev.typeKey(InputEventCodes.KEY_E);
-	dev.typeKey(InputEventCodes.KEY_L);
-	dev.typeKey(InputEventCodes.KEY_L);
-	dev.typeKey(InputEventCodes.KEY_O);
-	dev.typeKey(InputEventCodes.KEY_W);
-	dev.typeKey(InputEventCodes.KEY_O);
-	dev.typeKey(InputEventCodes.KEY_R);
-	dev.typeKey(InputEventCodes.KEY_L);
-	dev.typeKey(InputEventCodes.KEY_D);
-	dev.typeKey(InputEventCodes.KEY_ENTER);
+	dev.typeKeys(
+		EventCode.KEY_H, EventCode.KEY_E, EventCode.KEY_L, EventCode.KEY_L, 	EventCode.KEY_O,
+		EventCode.KEY_W, EventCode.KEY_O, EventCode.KEY_R, EventCode.KEY_L, EventCode.KEY_D,
+		EventCode.KEY_ENTER);
 }
+```
+
+Non-blocking monitoring of multiple devices (internally a single thread is created).
+
+```java
+
+		for (InputDevice device : InputDevice.getAllPointerDevices()) {
+			device.open();
+			device.grab();
+			InputController.getInstance().add(device, (d, e) -> {
+				System.err.println(d + " = " + e);
+			});
+		}
 ```
 
 ## History
@@ -157,6 +163,10 @@ try (UInputDevice dev = new UInputDevice("LinuxIO Test", (short) 0x1234, (short)
 
  * Added support for creating virtual devices.
  * Restored Java8 compatibility
+ * `InputEventCode` renamed to `EventCode` and turned into an `enum`. More convenience methods for typing keys.
+ * `UInputDevice` renamed to `InputDevice`.
+ * `UInputController` renamed to `InputController`.
+ * Added supported for properties and absolute value.
  
 #### 2.0
 

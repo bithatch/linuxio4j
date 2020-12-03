@@ -205,7 +205,7 @@ public class Ioctl {
 		if (size instanceof Integer) {
 			return (Integer) size;
 		} else if (size instanceof Class) {
-			return Native.getNativeSize((Class) size);
+			return Native.getNativeSize((Class<?>) size);
 		} else {
 			return Native.getNativeSize(size.getClass(), size);
 		}
