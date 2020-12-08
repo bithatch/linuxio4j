@@ -18,11 +18,14 @@
 package uk.co.bithatch.linuxio;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Input event codes. https://www.kernel.org/doc/html/v4.17/input/event-codes.html 
@@ -795,18 +798,21 @@ public enum EventCode
 	ABS_Y(Type.EV_ABS, 0x01),
 	ABS_Z(Type.EV_ABS, 0x02),
 
-	REL_CNT(Type.EV_REL, (0x0f + 1)),
-	REL_DIAL(Type.EV_REL, 0x07),
-	REL_HWHEEL(Type.EV_REL, 0x06),
-	REL_MAX(Type.EV_REL, 0x0f),
-	REL_MISC(Type.EV_REL, 0x09),
-	REL_RX(Type.EV_REL, 0x03),
-	REL_RY(Type.EV_REL, 0x04),
-	REL_RZ(Type.EV_REL, 0x05),
-	REL_WHEEL(Type.EV_REL, 0x08),
 	REL_X(Type.EV_REL, 0x00),
 	REL_Y(Type.EV_REL, 0x01),
 	REL_Z(Type.EV_REL, 0x02),
+	REL_RX(Type.EV_REL, 0x03),
+	REL_RY(Type.EV_REL, 0x04),
+	REL_RZ(Type.EV_REL, 0x05),
+	REL_HWHEEL(Type.EV_REL, 0x06),
+	REL_DIAL(Type.EV_REL, 0x07),
+	REL_WHEEL(Type.EV_REL, 0x08),
+	REL_MISC(Type.EV_REL, 0x09),
+	REL_RESERVED(Type.EV_REL, 0x0a),
+	REL_WHEEL_HI_RES(Type.EV_REL, 0x0b),
+	REL_HWHEEL_HI_RES(Type.EV_REL, 0x0c),
+	REL_MAX(Type.EV_REL, 0x0f),
+	REL_CNT(Type.EV_REL, (0x0f + 1)),
 
 	SW_CAMERA_LENS_COVER(Type.EV_SW, 0x09),
 	SW_CNT(Type.EV_SW, (0x0f + 1)),
@@ -947,6 +953,34 @@ public enum EventCode
 		else
 			throw new IllegalArgumentException("Unexpected format. Either eventType:eventCode or eventName.");
 	}
+	
+	/**
+	 * Get a list of event codes, filtered for the supplied types.
+	 *
+	 * @param types the types
+	 * @param code the code
+	 * @return true, if successful
+	 */
+	public static Set<EventCode> filteredForType(Type... types) {
+		return filteredForType(Arrays.asList(values()), types);
+	}
+	
+	/**
+	 * Get a list of event codes, filtered for the supplied types.
+	 *
+	 * @param types the types
+	 * @param code the code
+	 * @return true, if successful
+	 */
+	public static Set<EventCode> filteredForType(Collection<EventCode> codes, Type... types) {
+		List<Type> t = Arrays.asList(types);
+		Set<EventCode> l = new LinkedHashSet<>();
+		for(EventCode c : codes) {
+			if(t.contains(c.type()))
+				l.add(c);
+		}
+		return l;
+	}
 
 	/**
 	 * Checks if is button.
@@ -1022,7 +1056,7 @@ public enum EventCode
 
 		EventCode name = mmap.get(code);
 		if (name == null)
-			throw new IllegalArgumentException(String.format("No input event with code %d", code));
+			throw new IllegalArgumentException(String.format("No input event with code %d, type %s", code, type));
 		return name;
 	}
 

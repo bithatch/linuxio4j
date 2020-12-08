@@ -1137,7 +1137,12 @@ public class InputDevice implements Closeable {
 		}
 		ev.read();
 		ev.time.read();
-		return new Event(ev);
+		try {
+			return new Event(ev);
+		}
+		catch(IllegalArgumentException iae) {
+			throw new IllegalArgumentException(String.format("Unknown event code %d for type %d (value %d)", ev.code, ev.type, ev.value));
+		}
 	}
 
 	/**

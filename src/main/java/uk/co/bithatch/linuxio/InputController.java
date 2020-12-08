@@ -201,6 +201,8 @@ public class InputController {
 									}
 								} catch (EOFException eof) {
 									//
+								} catch(IllegalArgumentException iae) {
+									LOG.log(Level.WARNING, "Failed to process key.", iae);
 								}
 							}
 						}
