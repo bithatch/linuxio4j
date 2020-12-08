@@ -958,7 +958,6 @@ public enum EventCode
 	 * Get a list of event codes, filtered for the supplied types.
 	 *
 	 * @param types the types
-	 * @param code the code
 	 * @return true, if successful
 	 */
 	public static Set<EventCode> filteredForType(Type... types) {
@@ -968,8 +967,8 @@ public enum EventCode
 	/**
 	 * Get a list of event codes, filtered for the supplied types.
 	 *
-	 * @param types the types
-	 * @param code the code
+	 * @param codes the code
+	 * @param types types to filter for
 	 * @return true, if successful
 	 */
 	public static Set<EventCode> filteredForType(Collection<EventCode> codes, Type... types) {
